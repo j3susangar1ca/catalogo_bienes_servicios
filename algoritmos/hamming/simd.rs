@@ -1,7 +1,8 @@
 //! Motor SIMD portable para cálculo de Distancia de Hamming.
 
 use crate::error::{Result, HammingError};
-use core::simd::{Simd, SimdUint, LaneCount, SupportedLaneCount};
+use std::simd::prelude::*;
+use std::simd::{LaneCount, SupportedLaneCount};
 
 // =============================================================================
 // POPCOUNT XOR para arrays de u64 (Bit-Flags)
