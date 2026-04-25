@@ -1,7 +1,7 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
-import org.kde.kirigami as Kirigami
+import org.kde.kirigami 2.20 as Kirigami
 import QtQuick.Effects // Requerido para MultiEffect (Blur de Qt6)
 import com.omnibox.search 1.0 // Modelo C++ de búsqueda
 

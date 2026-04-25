@@ -9,6 +9,8 @@
 int main(int argc, char *argv[]) {
     // Optimizaciones nativas para Wayland y monitores de alta tasa de refresco
     qputenv("QT_QPA_PLATFORM", "wayland;xcb");
+    qputenv("QSG_RHI_BACKEND", "vulkan"); // Forzar Vulkan para tu Intel UHD 630
+    qputenv("QT_VIDEO_BACKEND", "ffmpeg");
     
     QGuiApplication app(argc, argv);
     app.setOrganizationName("EliteEngineering");
