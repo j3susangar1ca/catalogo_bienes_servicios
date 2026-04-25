@@ -1,0 +1,14 @@
+-rootPath
+/home/jesuslangarica/catalogo_bienes_servicios/frontend
+-cmake-output
+-output-file
+/home/jesuslangarica/catalogo_bienes_servicios/frontend/build/.qt/qml_imports/Omnibox_build.cmake
+-importPath
+/home/jesuslangarica/catalogo_bienes_servicios/frontend/build
+-importPath
+/home/jesuslangarica/catalogo_bienes_servicios/frontend/build/TheOmnibox
+-importPath
+/usr/lib64/qt6/qml
+-qrcFiles
+/home/jesuslangarica/catalogo_bienes_servicios/frontend/build/.qt/rcc/qmake_TheOmnibox.qrc
+/home/jesuslangarica/catalogo_bienes_servicios/frontend/build/.qt/rcc/Omnibox_raw_qml_0.qrc

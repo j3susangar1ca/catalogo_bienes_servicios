@@ -1,0 +1,6 @@
+<RCC>
+  <qresource prefix="/TheOmnibox/">
+    <file alias="Main.qml">/home/jesuslangarica/catalogo_bienes_servicios/frontend/Main.qml</file>
+  </qresource>
+</RCC>
+

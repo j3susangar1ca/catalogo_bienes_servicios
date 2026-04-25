@@ -1,0 +1,16 @@
+--bare
+-I
+/home/jesuslangarica/catalogo_bienes_servicios/frontend/build
+-I
+/home/jesuslangarica/catalogo_bienes_servicios/frontend/build/TheOmnibox
+-I
+/home/jesuslangarica/catalogo_bienes_servicios/frontend/build
+-I
+/usr/lib64/qt6/qml
+--resource
+/home/jesuslangarica/catalogo_bienes_servicios/frontend/build/.qt/rcc/qmake_TheOmnibox.qrc
+--resource
+/home/jesuslangarica/catalogo_bienes_servicios/frontend/build/.qt/rcc/Omnibox_raw_qml_0.qrc
+/home/jesuslangarica/catalogo_bienes_servicios/frontend/Main.qml
+--json
+/home/jesuslangarica/catalogo_bienes_servicios/frontend/build/Omnibox_qmllint.json

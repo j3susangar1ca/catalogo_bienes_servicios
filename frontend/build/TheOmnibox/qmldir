@@ -1,0 +1,6 @@
+module TheOmnibox
+typeinfo Omnibox.qmltypes
+prefer :/TheOmnibox/
+Main 1.0 Main.qml
+depends QtQuick
+

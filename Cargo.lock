@@ -640,6 +640,7 @@ name = "rust_engine"
 version = "0.1.0"
 dependencies = [
  "cxx",
+ "cxx-build",
  "fuzzy_search_engine",
  "hamming-hpc-engine",
  "jaccard-engine",
