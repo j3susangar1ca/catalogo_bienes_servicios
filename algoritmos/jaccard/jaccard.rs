@@ -14,11 +14,11 @@
 //! - Tipos seguros (`SimilarityScore`) y documentación exhaustiva con complejidades.
 
 use std::collections::HashSet;
-use std::hash::{Hash, Hasher};
+use std::hash::Hash;
 use std::sync::OnceLock;
 use std::time::Instant;
 
-use ahash::{AHasher, RandomState};
+use ahash::RandomState;
 use rayon::prelude::*;
 use unicode_normalization::UnicodeNormalization;
 
@@ -383,6 +383,7 @@ impl Catalog {
 // ---------------------------------------------------------------------------
 // Ejemplo de uso y benchmark básico
 // ---------------------------------------------------------------------------
+#[allow(dead_code)]
 fn main() {
     // Datos de ejemplo
     let products = vec![

@@ -282,7 +282,7 @@ impl PhoneticEncoder for DoubleMetaphone {
 
 /// Procesa la letra C en contexto.
 fn process_c(
-    b: &[u8],
+    _b: &[u8],
     pos: usize,
     _len: usize,
     p1: u8,
@@ -342,7 +342,7 @@ fn process_c(
 
 /// Procesa la letra G en contexto.
 fn process_g(
-    b: &[u8],
+    _b: &[u8],
     pos: usize,
     len: usize,
     _p1: u8,
@@ -392,7 +392,7 @@ fn process_g(
 
 /// Procesa la letra H — muda en español excepto en CH (ya manejado por C).
 fn process_h(
-    b: &[u8],
+    _b: &[u8],
     pos: usize,
     _len: usize,
     p1: u8,
@@ -419,7 +419,7 @@ fn process_h(
 
 /// Procesa la letra S.
 fn process_s(
-    b: &[u8],
+    _b: &[u8],
     pos: usize,
     _len: usize,
     _p1: u8,
@@ -455,7 +455,7 @@ fn process_s(
 
 /// Procesa la letra T.
 fn process_t(
-    b: &[u8],
+    _b: &[u8],
     pos: usize,
     _len: usize,
     _p1: u8,
@@ -491,7 +491,7 @@ fn process_t(
 
 /// Procesa la letra W.
 fn process_w(
-    b: &[u8],
+    _b: &[u8],
     pos: usize,
     _len: usize,
     _p1: u8,

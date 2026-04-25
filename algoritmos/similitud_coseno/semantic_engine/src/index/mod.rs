@@ -3,12 +3,12 @@
 //  Búsqueda exacta (lineal + Rayon) y aproximada (HNSW).
 // ============================================================
 
-use std::collections::{BinaryHeap, HashMap, HashSet};
+use std::collections::{BinaryHeap, HashSet};
 use std::cmp::Reverse;
 use ordered_float::OrderedFloat;
 use rayon::prelude::*;
 
-use crate::vector_math::{dot_simd, normalize_inplace, DIM};
+use crate::vector_math::{dot_simd, normalize_inplace};
 
 // ─────────────────────────────────────────────────────────────
 //  CATÁLOGO CENTRAL — Structure of Arrays (SoA)
@@ -61,6 +61,7 @@ impl VectorCatalog {
 
     /// Retorna el slice mutable del i-ésimo vector.
     #[inline(always)]
+    #[allow(dead_code)]
     fn get_mut(&mut self, i: usize) -> &mut [f32] {
         let start = i * self.dim;
         let end   = start + self.dim;

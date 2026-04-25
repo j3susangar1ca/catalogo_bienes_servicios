@@ -18,6 +18,7 @@ pub struct Embedding {
     /// Valores del vector (f32, longitud = DIM).
     pub data: Vec<f32>,
     /// Texto original del que se generó.
+    #[allow(dead_code)]
     pub source_text: String,
     /// ¿Ya normalizado (‖v‖=1)?
     pub is_normalized: bool,
@@ -140,6 +141,7 @@ fn mock_encode_text(text: &str, out: &mut [f32]) {
 ///     }
 /// }
 /// ```
+#[allow(dead_code)]
 pub struct OnnxEmbeddingBackend; // placeholder — sin dependencia real en este demo
 
 impl EmbeddingBackend for OnnxEmbeddingBackend {
@@ -154,6 +156,7 @@ impl EmbeddingBackend for OnnxEmbeddingBackend {
 // ─────────────────────────────────────────────────────────────
 /// Convierte un slice de descripciones de texto en embeddings listos
 /// para insertar en el catálogo.
+#[allow(dead_code)]
 pub fn encode_catalog<B: EmbeddingBackend>(
     backend: &B,
     descriptions: &[&str],
