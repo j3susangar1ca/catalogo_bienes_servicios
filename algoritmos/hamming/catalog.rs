@@ -1,7 +1,6 @@
 //! Índice de catálogo de 64K registros con búsqueda por proximidad Hamming.
 
 use crate::types::{BitMap, IdentityCode};
-use crate::error::Result;
 
 /// Registro individual del catálogo, alineado a 32 bytes para optimizar prefetch.
 #[repr(align(32))]

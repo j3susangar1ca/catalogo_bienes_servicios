@@ -83,7 +83,7 @@ impl BitMap {
     }
 
     /// Construye un `BitMap` aleatorio para benchmarking y tests.
-    #[cfg(any(test, feature = "rand"))]
+    #[cfg(test)]
     pub fn random(u64_count: usize) -> Self {
         use rand::Rng;
         let mut rng = rand::thread_rng();
