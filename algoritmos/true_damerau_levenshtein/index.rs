@@ -1,3 +1,4 @@
+use std::cell::RefCell;
 use std::sync::Arc;
 use rayon::prelude::*;
 use crate::metric::DistanceMetric;
@@ -5,17 +6,18 @@ use crate::types::{Distance, Similarity};
 use crate::error::{FuzzySearchError, Result};
 use crate::prelude::{preprocess_text, to_grapheme_clusters};
 
-/// Nodo inmutable del BK-Tree para acceso thread-safe con `Arc`.
+/// Nodo mutable del BK-Tree para acceso thread-safe con construcción eficiente.
 ///
-/// Diseñado para inmutabilidad post-construcción, permitiendo lecturas paralelas sin locks.
-#[derive(Debug, Clone)]
+/// Diseñado para mutación in-place durante la construcción usando `RefCell`,
+/// luego convertido a estructura inmutable para lecturas paralelas sin locks.
+#[derive(Debug)]
 struct Node<T> {
     /// Valor almacenado (preprocesado para búsquedas)
     value: Vec<String>,
     /// Payload asociado al valor
     payload: Option<T>,
     /// Hijos indexados por distancia desde este nodo
-    children: std::collections::HashMap<u32, Arc<Node<T>>>,
+    children: std::collections::HashMap<u32, Box<Node<T>>>,
 }
 
 impl<T> Node<T> {
@@ -39,8 +41,14 @@ impl<T> Node<T> {
 ///
 /// # Thread Safety
 ///
-/// - Lecturas paralelas: ✅ Seguras mediante `Arc<Node>` e inmutabilidad
+/// - Lecturas paralelas: ✅ Seguras mediante inmutabilidad post-construcción
 /// - Escrituras concurrentes: ❌ No soportadas (diseño write-once, read-many)
+///
+/// # Performance
+///
+/// La construcción usa mutación in-place con `Box<Node<T>>` para evitar
+/// el O(N²) por structural sharing. Las lecturas son thread-safe una vez
+/// construido el árbol.
 ///
 /// # Examples
 ///
@@ -58,7 +66,7 @@ pub struct BKTree<M, T>
 where
     M: DistanceMetric + Default,
 {
-    root: Option<Arc<Node<T>>>,
+    root: Option<Box<Node<T>>>,
     metric: M,
     /// Buffer reutilizable para normalización (optimización de allocations)
     preprocess_buffer: Vec<String>,
@@ -89,61 +97,50 @@ where
     /// # Complexity
     ///
     /// O(log n) promedio para distribución uniforme de distancias.
+    /// Mutación in-place para evitar O(N²) por structural sharing.
     pub fn insert(&mut self, key: String, payload: T) {
         let normalized = preprocess_text(&key, &mut self.preprocess_buffer)
             .expect("Unicode preprocessing failed")
             .to_vec();
         
-        let new_node = Arc::new(Node::new(normalized, Some(payload)));
+        let new_node = Box::new(Node::new(normalized, Some(payload)));
         
-        match &self.root {
+        match &mut self.root {
             None => {
                 self.root = Some(new_node);
             }
             Some(root) => {
-                // Inserción recursiva inmutable: crear nuevo camino sin mutar nodos existentes
-                let new_root = Self::insert_recursive(
-                    Arc::clone(root),
-                    new_node,
-                    &self.metric,
-                );
-                self.root = Some(new_root);
+                // Inserción iterativa in-place: evita clonar todo el camino
+                Self::insert_iterative(root, new_node, &self.metric);
             }
         }
     }
 
-    /// Inserta recursivamente manteniendo inmutabilidad mediante structural sharing.
-    fn insert_recursive(
-        current: Arc<Node<T>>,
-        new_node: Arc<Node<T>>,
+    /// Inserta iterativamente manteniendo mutación in-place.
+    fn insert_iterative(
+        root: &mut Box<Node<T>>,
+        new_node: Box<Node<T>>,
         metric: &M,
-    ) -> Arc<Node<T>> {
-        let dist = metric.distance(&current.value, &new_node.value).raw();
+    ) {
+        let mut current = root.as_mut();
+        let mut node_to_insert = Some(new_node);
         
-        // Clonar nodo actual para modificación inmutable
-        let mut new_children = current.children.clone();
-        
-        match new_children.get(&dist) {
-            Some(child) => {
-                // Recursar en subárbol existente
-                let updated_child = Self::insert_recursive(
-                    Arc::clone(child),
-                    new_node,
-                    metric,
-                );
-                new_children.insert(dist, updated_child);
-            }
-            None => {
-                // Nuevo hijo en esta distancia
-                new_children.insert(dist, new_node);
+        while let Some(to_insert) = node_to_insert.take() {
+            let dist = metric.distance(&current.value, &to_insert.value).raw();
+            
+            match current.children.get_mut(&dist) {
+                Some(child) => {
+                    // Continuar descendiendo en el subárbol existente
+                    current = child.as_mut();
+                    node_to_insert = Some(to_insert);
+                }
+                None => {
+                    // Insertar directamente como hijo
+                    current.children.insert(dist, to_insert);
+                    break;
+                }
             }
         }
-        
-        Arc::new(Node {
-            value: current.value.clone(),
-            payload: current.payload.clone(),
-            children: new_children,
-        })
     }
 
     /// Búsqueda difusa con umbral de similitud.
@@ -169,7 +166,7 @@ where
         
         if let Some(root) = &self.root {
             self.search_recursive(
-                root,
+                root.as_ref(),
                 &query_graphemes,
                 min_similarity,
                 &mut results,
@@ -182,7 +179,7 @@ where
     /// Búsqueda recursiva con poda por desigualdad triangular (optimización métrica).
     fn search_recursive(
         &self,
-        node: &Arc<Node<T>>,
+        node: &Node<T>,
         query: &[String],
         min_similarity: Similarity,
         results: &mut Vec<T>,
@@ -211,7 +208,7 @@ where
             let upper_bound = dist.raw() + child_dist;
             
             if lower_bound <= max_allowed_dist && upper_bound >= dist.raw().saturating_sub(max_allowed_dist) {
-                self.search_recursive(child, query, min_similarity, results);
+                self.search_recursive(child.as_ref(), query, min_similarity, results);
             }
         }
     }
@@ -246,11 +243,11 @@ where
         Self::count_recursive(&self.root)
     }
 
-    fn count_recursive(node: &Option<Arc<Node<T>>>) -> usize {
+    fn count_recursive(node: &Option<Box<Node<T>>>) -> usize {
         match node {
             None => 0,
             Some(n) => {
-                1 + n.children.values().map(|c| Self::count_recursive(&Some(Arc::clone(c)))).sum::<usize>()
+                1 + n.children.values().map(|c| Self::count_recursive(&Some(c.clone()))).sum::<usize>()
             }
         }
     }

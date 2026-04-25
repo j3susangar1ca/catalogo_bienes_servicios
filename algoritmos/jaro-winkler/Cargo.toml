@@ -9,3 +9,4 @@ path = "jaro_winkler.rs"
 
 [dependencies]
 unicode-segmentation = "1.10"
+arrayvec = "0.7"

@@ -157,71 +157,100 @@ impl PhoneticIndex {
 
 /// Genera todas las variantes de un código fonético con distancia de edición ≤ `max_d`.
 /// Incluye: borrados, sustituciones, inserciones y transposiciones.
+/// Usa BFS para generar variantes a todas las distancias hasta `max_d`.
 fn generate_variants(code: &Code, max_d: usize) -> Vec<(Code, usize)> {
     if max_d == 0 {
         return vec![];
     }
 
-    let chars: Vec<char> = code.chars().collect();
-    let mut variants = Vec::with_capacity(400);
+    let mut variants = Vec::with_capacity(400 * max_d);
+    let mut visited: FxHashSet<Code> = FxHashSet::default();
+    let mut queue: std::collections::VecDeque<(Code, usize)> = std::collections::VecDeque::new();
 
-    // Borrados
-    for i in 0..chars.len() {
-        let mut v = Code::new();
-        for (j, &c) in chars.iter().enumerate() {
-            if j != i {
-                let _ = v.try_push(c);
-            }
+    // Comenzar con el código original a distancia 0
+    queue.push_back((code.clone(), 0));
+    visited.insert(code.clone());
+
+    while let Some((current_code, dist)) = queue.pop_front() {
+        if dist >= max_d {
+            continue;
         }
-        variants.push((v, 1));
-    }
 
-    // Sustituciones
-    for i in 0..chars.len() {
-        for r in b'A'..=b'Z' {
-            let rch = r as char;
-            if rch == chars[i] {
-                continue;
-            }
+        let chars: Vec<char> = current_code.chars().collect();
+        let next_dist = dist + 1;
+
+        // Borrados
+        for i in 0..chars.len() {
             let mut v = Code::new();
             for (j, &c) in chars.iter().enumerate() {
-                let _ = v.try_push(if j == i { rch } else { c });
+                if j != i {
+                    let _ = v.try_push(c);
+                }
             }
-            variants.push((v, 1));
+            if visited.insert(v.clone()) {
+                variants.push((v.clone(), next_dist));
+                queue.push_back((v, next_dist));
+            }
         }
-    }
 
-    // Inserciones
-    for i in 0..=chars.len() {
-        for ins in b'A'..=b'Z' {
-            let insch = ins as char;
+        // Sustituciones
+        for i in 0..chars.len() {
+            for r in b'A'..=b'Z' {
+                let rch = r as char;
+                if rch == chars[i] {
+                    continue;
+                }
+                let mut v = Code::new();
+                for (j, &c) in chars.iter().enumerate() {
+                    let _ = v.try_push(if j == i { rch } else { c });
+                }
+                if visited.insert(v.clone()) {
+                    variants.push((v.clone(), next_dist));
+                    queue.push_back((v, next_dist));
+                }
+            }
+        }
+
+        // Inserciones (solo si la longitud lo permite)
+        if chars.len() < 10 {
+            for i in 0..=chars.len() {
+                for ins in b'A'..=b'Z' {
+                    let insch = ins as char;
+                    let mut v = Code::new();
+                    for (j, &c) in chars.iter().enumerate() {
+                        if j == i {
+                            let _ = v.try_push(insch);
+                        }
+                        let _ = v.try_push(c);
+                    }
+                    if i == chars.len() {
+                        let _ = v.try_push(insch);
+                    }
+                    if visited.insert(v.clone()) {
+                        variants.push((v.clone(), next_dist));
+                        queue.push_back((v, next_dist));
+                    }
+                }
+            }
+        }
+
+        // Transposiciones
+        for i in 0..chars.len().saturating_sub(1) {
             let mut v = Code::new();
             for (j, &c) in chars.iter().enumerate() {
                 if j == i {
-                    let _ = v.try_push(insch);
+                    let _ = v.try_push(chars[i + 1]);
+                } else if j == i + 1 {
+                    let _ = v.try_push(chars[i]);
+                } else {
+                    let _ = v.try_push(c);
                 }
-                let _ = v.try_push(c);
             }
-            if i == chars.len() {
-                let _ = v.try_push(insch);
-            }
-            variants.push((v, 1));
-        }
-    }
-
-    // Transposiciones
-    for i in 0..chars.len().saturating_sub(1) {
-        let mut v = Code::new();
-        for (j, &c) in chars.iter().enumerate() {
-            if j == i {
-                let _ = v.try_push(chars[i + 1]);
-            } else if j == i + 1 {
-                let _ = v.try_push(chars[i]);
-            } else {
-                let _ = v.try_push(c);
+            if visited.insert(v.clone()) {
+                variants.push((v.clone(), next_dist));
+                queue.push_back((v, next_dist));
             }
         }
-        variants.push((v, 1));
     }
 
     variants
