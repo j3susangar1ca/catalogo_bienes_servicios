@@ -1,0 +1,18 @@
+[workspace]
+resolver = "2"
+members = [
+    "algoritmos/hamming",
+    "algoritmos/jaccard",
+    "algoritmos/phonetic_index",
+    "algoritmos/sørensen_dice",
+    "algoritmos/true_damerau_levenshtein",
+    # Aquí irá nuestro orquestador principal:
+    "rust_engine" 
+]
+
+[profile.release]
+opt-level = 3
+lto = "fat"
+codegen-units = 1
+panic = "abort"
+target-cpu = "native" # Vital para que aproveche el AVX2 de tu i7-9700
