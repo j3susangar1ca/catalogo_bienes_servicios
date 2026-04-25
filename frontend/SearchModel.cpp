@@ -1,18 +1,65 @@
 #include "SearchModel.h"
 #include <QDebug>
 
-SearchModel::SearchModel(QObject *parent) 
-    : QAbstractListModel(parent)
-    , m_searchMaster(new_search_master()) 
-{
-    // Carga inicial del catálogo (esto usará tus 64GB de RAM)
-    // Nota: Asegúrate de que esta ruta sea válida o cámbiala según sea necesario.
-    m_searchMaster->cargar_catalogo("/home/jesuslangarica/catalogo_bienes_servicios/backend/datos/catalogo_real.csv");
+SearchModel::SearchModel(QObject *parent) : QAbstractListModel(parent) {
+    // 1. Instanciamos el motor de Rust (asignación de memoria HPC)
+    m_searchMaster = ffi::new_search_master();
+    
+    // 2. CARGA EN RAM (WARM-UP)
+    // Pasamos la ruta absoluta de tu archivo.
+    QString csvPath = "/home/jesuslangarica/catalogo_bienes_servicios/catalogo.csv";
+    
+    qDebug() << "[HPC ENGINE] Iniciando carga de catálogo en 64GB RAM...";
+    bool success = m_searchMaster->cargar_catalogo(csvPath.toStdString());
+    
+    if(success) {
+        qDebug() << "[HPC ENGINE] Catálogo vectorizado y listo para The Omnibox.";
+    } else {
+        qWarning() << "[ERROR] No se pudo leer catalogo.csv. Verifica la ruta.";
+    }
 }
 
-int SearchModel::rowCount(const QModelIndex &parent) const {
-    if (parent.isValid()) return 0;
-    return m_results.size();
+int SearchModel::activeAlgorithm() const { return m_activeAlgorithm; }
+
+void SearchModel::setActiveAlgorithm(int algoIndex) {
+    if (m_activeAlgorithm != algoIndex) {
+        m_activeAlgorithm = algoIndex;
+        emit algorithmChanged();
+    }
+}
+
+void SearchModel::search(const QString &query) {
+    // Si la búsqueda está vacía, limpiamos la lista visualmente
+    if(query.trimmed().isEmpty()) {
+        beginResetModel();
+        m_results.clear();
+        endResetModel();
+        return;
+    }
+
+    // Le decimos a la UI que vamos a cambiar los datos (para las animaciones de QML)
+    beginResetModel();
+    
+    // Mapeo del UI (0 al 4) a los Tipos de Rust
+    ffi::AlgoritmoType rustAlgo;
+    switch(m_activeAlgorithm) {
+        case 0: rustAlgo = ffi::AlgoritmoType::Hamming; break;
+        case 1: rustAlgo = ffi::AlgoritmoType::SorensenDice; break;
+        case 2: rustAlgo = ffi::AlgoritmoType::Phonetic; break;
+        case 3: rustAlgo = ffi::AlgoritmoType::DamerauLevenshtein; break;
+        case 4: rustAlgo = ffi::AlgoritmoType::Jaccard; break;
+        default: rustAlgo = ffi::AlgoritmoType::Hamming;
+    }
+
+    // DISPARO A RUST: Rayon usa los 8 núcleos de tu i7
+    auto rustResults = m_searchMaster->buscar(query.toStdString(), rustAlgo);
+
+    m_results.clear();
+    for (const auto& res : rustResults) {
+        m_results.push_back(res);
+    }
+
+    endResetModel();
 }
 
 QVariant SearchModel::data(const QModelIndex &index, int role) const {
@@ -27,48 +74,15 @@ QVariant SearchModel::data(const QModelIndex &index, int role) const {
     return QVariant();
 }
 
+int SearchModel::rowCount(const QModelIndex &parent) const {
+    if (parent.isValid()) return 0;
+    return m_results.size();
+}
+
 QHash<int, QByteArray> SearchModel::roleNames() const {
     QHash<int, QByteArray> roles;
     roles[IdRole] = "id";
     roles[NombreRole] = "nombre";
     roles[ScoreRole] = "score";
     return roles;
-}
-
-void SearchModel::setActiveAlgorithm(int algoIndex) {
-    if (m_activeAlgorithm != algoIndex) {
-        m_activeAlgorithm = algoIndex;
-        emit algorithmChanged();
-        
-        if (!m_lastQuery.isEmpty()) {
-            search(m_lastQuery);
-        }
-    }
-}
-
-void SearchModel::search(const QString &query) {
-    m_lastQuery = query;
-    
-    // 1. Limpiamos resultados previos con señales de inicio/fin para que QML anime
-    beginResetModel();
-    
-    // 2. Mapeamos el index de la UI al enum de Rust
-    AlgoritmoType rustAlgo;
-    switch(m_activeAlgorithm) {
-        case 0: rustAlgo = AlgoritmoType::Hamming; break;
-        case 1: rustAlgo = AlgoritmoType::SorensenDice; break;
-        case 2: rustAlgo = AlgoritmoType::Phonetic; break;
-        case 3: rustAlgo = AlgoritmoType::DamerauLevenshtein; break;
-        case 4: rustAlgo = AlgoritmoType::Jaccard; break;
-        default: rustAlgo = AlgoritmoType::Hamming;
-    }
-
-    // 3. LLAMADA DE ALTO RENDIMIENTO A RUST
-    rust::String rust_query(query.toStdString());
-    auto rustResults = m_searchMaster->buscar(rust_query, rustAlgo);
-
-    // 4. Actualizamos el vector interno
-    m_results = std::move(rustResults);
-
-    endResetModel();
 }

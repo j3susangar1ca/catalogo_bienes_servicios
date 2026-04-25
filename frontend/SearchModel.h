@@ -1,16 +1,12 @@
-#ifndef SEARCHMODEL_H
-#define SEARCHMODEL_H
-
+#pragma once
 #include <QAbstractListModel>
 #include <QString>
-#include <QVector>
+#include <vector>
+#include "rust_engine/src/lib.rs.h" // El puente FFI generado por CXX
 
-// Cabecera generada por cxx
-#include "rust_engine/src/lib.rs.h"
-
-class SearchModel : public QAbstractListModel
-{
+class SearchModel : public QAbstractListModel {
     Q_OBJECT
+    // Propiedad que QML leerá y modificará cuando cambies de algoritmo (Chips)
     Q_PROPERTY(int activeAlgorithm READ activeAlgorithm WRITE setActiveAlgorithm NOTIFY algorithmChanged)
 
 public:
@@ -22,23 +18,25 @@ public:
 
     explicit SearchModel(QObject *parent = nullptr);
 
+    // Métodos obligatorios de Qt para listas fluidas
     int rowCount(const QModelIndex &parent = QModelIndex()) const override;
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
     QHash<int, QByteArray> roleNames() const override;
 
-    int activeAlgorithm() const { return m_activeAlgorithm; }
-    void setActiveAlgorithm(int algorithm);
-
+    // Métodos invocables desde QML
     Q_INVOKABLE void search(const QString &query);
+    
+    int activeAlgorithm() const;
+    void setActiveAlgorithm(int algoIndex);
 
 signals:
     void algorithmChanged();
 
 private:
-    int m_activeAlgorithm = 0;
-    rust::Box<SearchMaster> m_searchMaster;
-    rust::Vec<SearchResult> m_results;
-    QString m_lastQuery;
+    // Puntero inteligente al motor de Rust
+    rust::Box<ffi::SearchMaster> m_searchMaster;
+    
+    // Resultados cacheados para la UI
+    std::vector<ffi::SearchResult> m_results;
+    int m_activeAlgorithm = 0; // 0 = Hamming por defecto
 };
-
-#endif // SEARCHMODEL_H

@@ -3,28 +3,30 @@
 #include <QQmlContext>
 #include "SearchModel.h"
 
-int main(int argc, char *argv[])
-{
+int main(int argc, char *argv[]) {
+    // Optimizaciones nativas para Wayland y monitores de alta tasa de refresco
+    qputenv("QT_QPA_PLATFORM", "wayland;xcb");
+    
     QGuiApplication app(argc, argv);
+    app.setOrganizationName("EliteEngineering");
+    app.setApplicationName("TheOmnibox");
 
-    app.setOrganizationName("TheOmnibox");
-    app.setApplicationName("Omnibox");
-
-    qmlRegisterType<SearchModel>("TheOmnibox", 1, 0, "SearchModel");
+    // 1. Registramos tu clase C++ para que QML la reconozca como un componente visual
+    qmlRegisterType<SearchModel>("com.omnibox.search", 1, 0, "SearchModel");
 
     QQmlApplicationEngine engine;
-    
-    // Registrar el modelo para que esté disponible en QML si se prefiere una instancia global,
-    // pero en el QML proporcionado se instancia como SearchModel { id: rustModel }.
-    // qmlRegisterType arriba es suficiente.
 
-    const QUrl url(u"qrc:/qt/qml/Main.qml"_qs);
+    // 2. Cargamos la interfaz QML
+    // Nota: Ajusta esta ruta si tu Main.qml está en otro lado. 
+    // Usamos ruta absoluta temporal para garantizar que funcione al primer intento.
+    const QUrl url(QStringLiteral("file:///home/jesuslangarica/catalogo_bienes_servicios/frontend/Main.qml"));
+    
     QObject::connect(&engine, &QQmlApplicationEngine::objectCreated,
                      &app, [url](QObject *obj, const QUrl &objUrl) {
         if (!obj && url == objUrl)
             QCoreApplication::exit(-1);
     }, Qt::QueuedConnection);
-    
+
     engine.load(url);
 
     return app.exec();

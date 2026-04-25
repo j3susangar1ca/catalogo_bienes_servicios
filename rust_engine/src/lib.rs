@@ -13,7 +13,7 @@ struct Record {
     activo: i32,
 }
 
-#[cxx::bridge]
+#[cxx::bridge(namespace = "ffi")]
 mod ffi {
     enum AlgoritmoType {
         Hamming,
