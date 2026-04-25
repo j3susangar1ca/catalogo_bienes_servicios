@@ -5,6 +5,10 @@ edition = "2021"
 
 [lib]
 name = "sorensen_dice_engine"
+path = "lib.rs"
+
+[[bin]]
+name = "sorensen_dice_demo"
 path = "main.rs"
 
 [dependencies]
