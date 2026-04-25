@@ -218,7 +218,7 @@ impl DistanceMetric for DamerauLevenshtein {
                     db = j;
                     0
                 } else {
-                    Self::substitution_cost(&a[i-1], &b[j-1]) as u32
+                    self.substitution_cost(&a[i-1], &b[j-1]) as u32
                 };
 
                 // Cálculo de los 4 posibles estados (Sustitución, Inserción, Eliminación, Transposición)
