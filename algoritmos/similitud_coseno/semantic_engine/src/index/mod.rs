@@ -405,7 +405,7 @@ impl HnswIndex {
                 let d = dist(catalog.get(i), query);
                 // Convertimos distancia euclídea a similitud coseno aproximada
                 // (válido cuando los vectores están normalizados: cos ≈ 1 - d²/2).
-                let score = 1.0 - (d * d) / 2.0;
+                let score = 1.0 - d / 2.0;
                 SearchResult {
                     index: i,
                     label: catalog.labels[i].clone(),
@@ -422,5 +422,6 @@ impl HnswIndex {
 #[inline(always)]
 fn dist(a: &[f32], b: &[f32]) -> f32 {
     // Para vectores normalizados: ‖A-B‖² = 2 - 2·(A·B) → monotónico con coseno.
-    a.iter().zip(b.iter()).map(|(x, y)| (x - y) * (x - y)).sum::<f32>().sqrt()
+    // Retornamos distancia cuadrada (L2²) para evitar sqrt() innecesario.
+    a.iter().zip(b.iter()).map(|(x, y)| (x - y) * (x - y)).sum::<f32>()
 }
