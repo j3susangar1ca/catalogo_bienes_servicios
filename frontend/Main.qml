@@ -41,8 +41,8 @@ ApplicationWindow {
     MouseArea {
         anchors.fill: parent
         property variant clickPos: "1,1"
-        onPressed: clickPos = Qt.point(mouse.x, mouse.y)
-        onPositionChanged: {
+        onPressed: (mouse) => clickPos = Qt.point(mouse.x, mouse.y)
+        onPositionChanged: (mouse) => {
             if (pressed) {
                 window.x += (mouse.x - clickPos.x);
                 window.y += (mouse.y - clickPos.y);
