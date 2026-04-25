@@ -1,0 +1,2 @@
+[dependencies]
+unicode-segmentation = "1.10"
