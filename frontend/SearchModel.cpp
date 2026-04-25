@@ -7,7 +7,8 @@ SearchModel::SearchModel(QObject *parent) : QAbstractListModel(parent) {
     
     // 2. CARGA EN RAM (WARM-UP)
     // Pasamos la ruta absoluta de tu archivo.
-    QString csvPath = "/home/jesuslangarica/catalogo_bienes_servicios/catalogo.csv";
+    // Pasamos la ruta relativa al ejecutable.
+    QString csvPath = QCoreApplication::applicationDirPath() + "/catalogo.csv";
     
     qDebug() << "[HPC ENGINE] Iniciando carga de catálogo en 64GB RAM...";
     bool success = m_searchMaster->cargar_catalogo(csvPath.toStdString());
