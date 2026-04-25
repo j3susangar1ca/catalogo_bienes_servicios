@@ -85,6 +85,7 @@ pub struct DamerauLevenshtein {
     /// Factor de peso para sustituciones numéricas (default: 2.0)
     numeric_substitution_weight: f64,
     /// Factor de peso para transposiciones alfabéticas (default: 1.0)
+    #[allow(dead_code)]
     alpha_transposition_weight: f64,
 }
 
@@ -116,6 +117,7 @@ impl DamerauLevenshtein {
 
     /// Calcula costo de transposición con validación alfabética.
     #[inline]
+    #[allow(dead_code)]
     fn transposition_cost(&self, a_prev: &str, a_curr: &str, b_prev: &str, b_curr: &str) -> f64 {
         if a_prev == b_curr && a_curr == b_prev {
             // Solo aplica peso especial si son caracteres alfabéticos

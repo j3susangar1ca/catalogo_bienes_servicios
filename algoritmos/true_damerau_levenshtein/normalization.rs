@@ -1,6 +1,6 @@
-use unicode_normalization::{UnicodeNormalization, char::is_combining_mark};
+use unicode_normalization::UnicodeNormalization;
 use unicode_segmentation::UnicodeSegmentation;
-use crate::error::{FuzzySearchError, Result};
+use crate::error::Result;
 
 /// Normaliza texto a forma NFC para consistencia en comparaciones.
 ///

@@ -43,11 +43,17 @@
 #![warn(missing_docs)]
 #![cfg_attr(feature = "bench", feature(test))]
 
+/// Módulo para normalización de texto y manejo de grafemas.
 pub mod normalization;
+/// Re-exportes principales del motor de búsqueda difusa.
 pub mod prelude;
+/// Implementaciones de métricas de distancia (ej: Damerau-Levenshtein).
 pub mod metric;
+/// Estructuras de indexación para espacios métricos (ej: BK-Tree).
 pub mod index;
+/// Tipos base utilizados en la evaluación de distancias y similitudes.
 pub mod types;
+/// Definición de errores del motor de búsqueda.
 pub mod error;
 
 pub use error::FuzzySearchError;
