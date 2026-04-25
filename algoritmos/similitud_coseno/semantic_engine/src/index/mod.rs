@@ -428,6 +428,7 @@ fn dist_squared(a: &[f32], b: &[f32]) -> f32 {
 }
 
 // Alias para compatibilidad con código existente que llama a `dist`
+// NOTA: dist() ahora retorna distancia cuadrada para consistencia con HNSW search
 #[inline(always)]
 fn dist(a: &[f32], b: &[f32]) -> f32 {
     dist_squared(a, b)

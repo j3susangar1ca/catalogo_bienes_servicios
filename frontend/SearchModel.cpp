@@ -1,4 +1,6 @@
 #include "SearchModel.h"
+#include <QStandardPaths>
+#include <QDir>
 #include <QDebug>
 
 SearchModel::SearchModel(QObject *parent) : QAbstractListModel(parent) {
@@ -6,9 +8,16 @@ SearchModel::SearchModel(QObject *parent) : QAbstractListModel(parent) {
     m_searchMaster = ffi::new_search_master();
     
     // 2. CARGA EN RAM (WARM-UP)
-    // Pasamos la ruta absoluta de tu archivo.
-    // Pasamos la ruta relativa al ejecutable.
-    QString csvPath = QCoreApplication::applicationDirPath() + "/catalogo.csv";
+    // Ruta configurable: primero variable de entorno, luego ubicación estándar de Qt
+    QString csvPath = qEnvironmentVariable("CATALOGO_CSV_PATH", "");
+    if (csvPath.isEmpty()) {
+        // Buscar en directorio de datos de la aplicación
+        QString appDataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+        QDir().mkpath(appDataPath);
+        csvPath = appDataPath + "/catalogo.csv";
+    }
+    
+    qDebug() << "[HPC ENGINE] Cargando catálogo desde:" << csvPath;
     
     qDebug() << "[HPC ENGINE] Iniciando carga de catálogo en 64GB RAM...";
     bool success = m_searchMaster->cargar_catalogo(csvPath.toStdString());
