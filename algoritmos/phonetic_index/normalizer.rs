@@ -74,7 +74,7 @@ mod tests {
     #[test]
     fn ene_decomposed() {
         // n + combining tilde  (U+006E U+0303)
-        assert_eq!(normalize("Espa\u{0303}na"), "espanya");
+        assert_eq!(normalize("Espan\u{0303}a"), "espanya");
         // Nota: \u{0311} es inverted breve, no tilde. Probemos con tilde real:
         assert_eq!(normalize("n\u{0303}o"), "nyo");
     }
