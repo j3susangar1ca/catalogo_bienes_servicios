@@ -1,6 +1,5 @@
 //! Motor SIMD portable para cálculo de Distancia de Hamming.
 
-use std::simd::prelude::*;
 use crate::error::{Result, HammingError};
 
 // =============================================================================
