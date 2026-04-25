@@ -50,6 +50,7 @@ fn get_matcher() -> JaroWinklerMatcher {
 
     #[test]
     fn test_caterpillar_vs_cat() {
+        let matcher = get_matcher();
         let score = matcher.similarity("Caterpillar", "Cat").unwrap();
         // Coincidencia exacta del prefijo, pero gran castigo por longitud
         assert!(score > 0.80 && score < 0.85); 
