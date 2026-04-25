@@ -43,6 +43,7 @@
 #![warn(missing_docs)]
 #![cfg_attr(feature = "bench", feature(test))]
 
+pub mod normalization;
 pub mod prelude;
 pub mod metric;
 pub mod index;

@@ -1,5 +1,5 @@
 // src/prelude/mod.rs
-pub mod normalization;
+use crate::normalization;
 
 pub use normalization::{
     normalize_nfc,
