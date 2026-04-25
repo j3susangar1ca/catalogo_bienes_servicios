@@ -57,6 +57,7 @@ execute_process(
     OUTPUT_VARIABLE CXXBRIDGE_INCLUDE_DIR
     OUTPUT_STRIP_TRAILING_WHITESPACE
 )
+string(REPLACE "\n" ";" CXXBRIDGE_INCLUDE_DIR "${CXXBRIDGE_INCLUDE_DIR}")
 
 if(NOT CXXBRIDGE_INCLUDE_DIR)
     # Fallback: usar el directorio include estándar de rust_engine
