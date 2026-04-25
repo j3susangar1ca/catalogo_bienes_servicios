@@ -1,11 +1,11 @@
 //! Motor SIMD portable para cálculo de Distancia de Hamming.
 //!
-//! Implementa `d_H(x, y) = popcount(x XOR y)` utilizando `core::simd`.
+//! Implementa `d_H(x, y) = popcount(x XOR y)` utilizando `std::simd`.
 //! La selección del ancho de vector (LANES) se realiza en tiempo de compilación
 //! mediante `cfg` flags, aprovechando AVX-512 (8×u64), AVX2 (4×u64) o NEON (2×u64).
 
-use core::simd::{Simd, LaneCount, SupportedLaneCount};
-use core::simd::num::SimdUint;
+use std::simd::{Simd, LaneCount, SupportedLaneCount};
+use std::simd::num::SimdUint;
 use crate::error::{Result, HammingError};
 
 // =============================================================================
