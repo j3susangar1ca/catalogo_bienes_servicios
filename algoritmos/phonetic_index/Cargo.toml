@@ -2,6 +2,9 @@
 name = "phonetic_index"
 version = "0.1.0"
 edition = "2021"
+[lib]
+name = "phonetic_index"
+path = "lib.rs"
 
 [dependencies]
 rayon = "1.10"

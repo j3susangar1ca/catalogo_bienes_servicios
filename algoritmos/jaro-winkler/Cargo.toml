@@ -1,2 +1,11 @@
+[package]
+name = "jaro-winkler-engine"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+name = "jaro_winkler_engine"
+path = "jaro_winkler.rs"
+
 [dependencies]
 unicode-segmentation = "1.10"

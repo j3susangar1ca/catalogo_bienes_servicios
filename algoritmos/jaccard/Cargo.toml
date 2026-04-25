@@ -1,0 +1,12 @@
+[package]
+name = "jaccard-engine"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+name = "jaccard_engine"
+path = "jaccard.rs"
+
+[dependencies]
+unicode-segmentation = "1.10"
+ahash = "0.8"
