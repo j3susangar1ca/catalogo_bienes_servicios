@@ -2,6 +2,7 @@
 #include <QAbstractListModel>
 #include <QString>
 #include <vector>
+#include <QFutureWatcher>
 #include "rust_engine/src/lib.rs.h" // El puente FFI generado por CXX
 
 class SearchModel : public QAbstractListModel {
@@ -39,4 +40,8 @@ private:
     // Resultados cacheados para la UI
     std::vector<ffi::SearchResult> m_results;
     int m_activeAlgorithm = 0; // 0 = Hamming por defecto
+
+    QFutureWatcher<rust::Vec<ffi::SearchResult>>* m_watcher = nullptr;
+    bool m_searchInProgress = false;
 };
+

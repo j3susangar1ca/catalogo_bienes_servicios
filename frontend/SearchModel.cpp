@@ -4,6 +4,8 @@
 #include <QDebug>
 #include <QCoreApplication>
 #include <QFile>
+#include <QFuture>
+#include <QtConcurrent/QtConcurrent>
 
 SearchModel::SearchModel(QObject *parent) 
     : QAbstractListModel(parent), 
@@ -56,7 +58,6 @@ void SearchModel::setActiveAlgorithm(int algoIndex) {
 }
 
 void SearchModel::search(const QString &query) {
-    // Si la búsqueda está vacía, limpiamos la lista visualmente
     if(query.trimmed().isEmpty()) {
         beginResetModel();
         m_results.clear();
@@ -64,10 +65,12 @@ void SearchModel::search(const QString &query) {
         return;
     }
 
-    // Le decimos a la UI que vamos a cambiar los datos (para las animaciones de QML)
-    beginResetModel();
-    
-    // Mapeo del UI (0 al 4) a los Tipos de Rust
+    if (m_searchInProgress) {
+        return;  // Evitar búsquedas superpuestas
+    }
+
+    m_searchInProgress = true;
+
     ffi::AlgoritmoType rustAlgo;
     switch(m_activeAlgorithm) {
         case 0: rustAlgo = ffi::AlgoritmoType::Hamming; break;
@@ -80,15 +83,25 @@ void SearchModel::search(const QString &query) {
         default: rustAlgo = ffi::AlgoritmoType::Hamming;
     }
 
-    // DISPARO A RUST: Rayon usa los 8 núcleos de tu i7
-    auto rustResults = m_searchMaster->buscar(query.toStdString(), rustAlgo);
+    auto future = QtConcurrent::run([this, query, rustAlgo]() {
+        return m_searchMaster->buscar(query.toStdString(), rustAlgo);
+    });
 
-    m_results.clear();
-    for (const auto& res : rustResults) {
-        m_results.push_back(res);
+    if (!m_watcher) {
+        m_watcher = new QFutureWatcher<rust::Vec<ffi::SearchResult>>(this);
+        connect(m_watcher, &QFutureWatcherBase::finished, this, [this]() {
+            beginResetModel();
+            m_results.clear();
+            auto rustResults = m_watcher->result();
+            for (const auto& res : rustResults) {
+                m_results.push_back(res);
+            }
+            m_searchInProgress = false;
+            endResetModel();
+        });
     }
 
-    endResetModel();
+    m_watcher->setFuture(future);
 }
 
 QVariant SearchModel::data(const QModelIndex &index, int role) const {
