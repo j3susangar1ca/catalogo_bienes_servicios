@@ -1,1 +1,0 @@
-/home/jesuslangarica/catalogo_bienes_servicios/target/debug/librust_engine.a: /home/jesuslangarica/catalogo_bienes_servicios/rust_engine/build.rs /home/jesuslangarica/catalogo_bienes_servicios/rust_engine/src/lib.rs

@@ -1,2 +1,0 @@
-set(__QT_DEPLOY_TARGET_Omnibox_FILE /home/jesuslangarica/catalogo_bienes_servicios/frontend/build/Omnibox)
-set(__QT_DEPLOY_TARGET_Omnibox_TYPE EXECUTABLE)

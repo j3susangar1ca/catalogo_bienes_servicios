@@ -11,7 +11,7 @@
 class SearchModel : public QAbstractListModel
 {
     Q_OBJECT
-    Q_PROPERTY(int activeAlgorithm READ activeAlgorithm WRITE setActiveAlgorithm NOTIFY activeAlgorithmChanged)
+    Q_PROPERTY(int activeAlgorithm READ activeAlgorithm WRITE setActiveAlgorithm NOTIFY algorithmChanged)
 
 public:
     enum Roles {
@@ -32,10 +32,11 @@ public:
     Q_INVOKABLE void search(const QString &query);
 
 signals:
-    void activeAlgorithmChanged();
+    void algorithmChanged();
 
 private:
     int m_activeAlgorithm = 0;
+    rust::Box<SearchMaster> m_searchMaster;
     rust::Vec<SearchResult> m_results;
     QString m_lastQuery;
 };

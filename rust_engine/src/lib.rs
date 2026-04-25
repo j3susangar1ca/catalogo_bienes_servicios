@@ -1,5 +1,13 @@
 #[cxx::bridge]
 mod ffi {
+    enum AlgoritmoType {
+        Hamming,
+        SorensenDice,
+        Phonetic,
+        DamerauLevenshtein,
+        Jaccard,
+    }
+
     struct SearchResult {
         id: String,
         nombre: String,
@@ -7,34 +15,44 @@ mod ffi {
     }
 
     extern "Rust" {
-        fn search_in_rust(query: &String, algorithm: i32) -> Vec<SearchResult>;
+        type SearchMaster;
+
+        fn new_search_master() -> Box<SearchMaster>;
+        fn cargar_catalogo(self: &SearchMaster, path: &str);
+        fn buscar(self: &SearchMaster, query: String, algo: AlgoritmoType) -> Vec<SearchResult>;
     }
 }
 
-pub fn search_in_rust(query: &String, algorithm: i32) -> Vec<ffi::SearchResult> {
-    // Aquí iría la lógica que conecta con tus motores optimizados
-    // Por ahora devolvemos datos de prueba para validar la UI
-    let mut results = Vec::new();
-    
-    if query.is_empty() {
-        return results;
+pub struct SearchMaster {
+    // Aquí iría el catálogo real y los motores
+}
+
+impl SearchMaster {
+    fn new() -> Box<SearchMaster> {
+        Box::new(SearchMaster {})
     }
 
-    results.push(ffi::SearchResult {
-        id: "SKU-001".to_string(),
-        nombre: format!("Resultado para {} (Algoritmo {})", query, algorithm),
-        score: 0.95,
-    });
-    results.push(ffi::SearchResult {
-        id: "SKU-002".to_string(),
-        nombre: "Monitor Gaming 4K".to_string(),
-        score: 0.85,
-    });
-    results.push(ffi::SearchResult {
-        id: "SKU-003".to_string(),
-        nombre: "Teclado Mecánico RGB".to_string(),
-        score: 0.72,
-    });
+    fn cargar_catalogo(&self, path: &str) {
+        println!("Cargando catálogo desde: {}", path);
+        // Simulación de carga
+    }
 
-    results
+    fn buscar(&self, query: String, algo: ffi::AlgoritmoType) -> Vec<ffi::SearchResult> {
+        let mut results = Vec::new();
+        if query.is_empty() {
+            return results;
+        }
+
+        results.push(ffi::SearchResult {
+            id: "SKU-999".to_string(),
+            nombre: format!("{} [Algoritmo: {:?}]", query, algo),
+            score: 0.98,
+        });
+
+        results
+    }
+}
+
+pub fn new_search_master() -> Box<SearchMaster> {
+    SearchMaster::new()
 }

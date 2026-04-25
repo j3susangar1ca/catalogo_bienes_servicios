@@ -1,1 +1,0 @@
-/home/jesuslangarica/catalogo_bienes_servicios/frontend/build/./cargo/build/x86_64-unknown-linux-gnu/debug/librust_engine.rlib: /home/jesuslangarica/catalogo_bienes_servicios/rust_engine/build.rs /home/jesuslangarica/catalogo_bienes_servicios/rust_engine/src/lib.rs

@@ -1,1 +1,0 @@
-/home/jesuslangarica/catalogo_bienes_servicios/frontend/build/corrosion/required_libs/target/x86_64-unknown-linux-gnu/debug/librequired_libs.a: /home/jesuslangarica/catalogo_bienes_servicios/frontend/build/corrosion/required_libs/lib.rs

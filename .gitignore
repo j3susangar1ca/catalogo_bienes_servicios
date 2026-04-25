@@ -1,0 +1,35 @@
+# C++ / Build
+frontend/build/
+build/
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+Makefile
+*.o
+*.a
+*.so
+*.out
+Omnibox
+OmniboxLauncher
+TheOmnibox
+
+# Rust
+target/
+**/*.rs.bk
+# Cargo.lock # Descomentar si es una aplicación final, dejar comentado si es librería
+
+# IDEs / Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.kateconfig
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Project Specific
+*.csv
+backend/datos/catalogo_real.csv
