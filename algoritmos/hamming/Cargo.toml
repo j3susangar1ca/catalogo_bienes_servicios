@@ -19,4 +19,5 @@ rand = "0.8"
 
 [[bench]]
 name = "hamming_benchmark"
+path = "hamming_benchmark.rs"
 harness = false
