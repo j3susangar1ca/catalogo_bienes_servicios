@@ -26,18 +26,45 @@ qt_add_qml_module(OmniboxLauncher
     QML_FILES Main.qml
 )
 
-# Enlace de librerías
-# Buscar dinámicamente la librería de Rust (debug o release)
-find_file(RUST_ENGINE_LIB
+# Buscar dinámicamente el directorio de cxxbridge generado por Cargo
+execute_process(
+    COMMAND find ${CMAKE_CURRENT_SOURCE_DIR}/../target -path "*/rust_engine-*/out/cxxbridge/include"
+    OUTPUT_VARIABLE CXXBRIDGE_INCLUDE_DIR
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+)
+
+if(NOT CXXBRIDGE_INCLUDE_DIR)
+    message(FATAL_ERROR 
+        "cxxbridge include dir not found. Run 'cargo build -p rust_engine' first."
+    )
+endif()
+
+message(STATUS "cxxbridge include: ${CXXBRIDGE_INCLUDE_DIR}")
+
+# Buscar dinámicamente la librería estática de Rust
+find_file(RUST_ENGINE_LIB_DEBUG
     NAMES librust_engine.a
     PATHS ${CMAKE_CURRENT_SOURCE_DIR}/../target/debug
-          ${CMAKE_CURRENT_SOURCE_DIR}/../target/release
+    NO_DEFAULT_PATH
+)
+find_file(RUST_ENGINE_LIB_RELEASE
+    NAMES librust_engine.a
+    PATHS ${CMAKE_CURRENT_SOURCE_DIR}/../target/release
     NO_DEFAULT_PATH
 )
 
+set(RUST_ENGINE_LIB "${RUST_ENGINE_LIB_RELEASE}")
 if(NOT RUST_ENGINE_LIB)
-    message(FATAL_ERROR "Could not find librust_engine.a. Run `cargo build` first.")
+    set(RUST_ENGINE_LIB "${RUST_ENGINE_LIB_DEBUG}")
 endif()
+
+if(NOT RUST_ENGINE_LIB)
+    message(FATAL_ERROR 
+        "librust_engine.a not found. Run 'cargo build -p rust_engine' first."
+    )
+endif()
+
+message(STATUS "Rust engine lib: ${RUST_ENGINE_LIB}")
 
 target_link_libraries(OmniboxLauncher PRIVATE
     Qt6::Quick
@@ -50,17 +77,8 @@ target_link_libraries(OmniboxLauncher PRIVATE
     dl rt m pthread
 )
 
-# Ruta para encontrar lib.rs.h y cxxbridge headers
-set(CXXBRIDGE_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../target/cxxbridge)
-
-if(NOT CXXBRIDGE_INCLUDE_DIR)
-    # Fallback: usar el directorio include estándar de rust_engine
-    set(CXXBRIDGE_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../rust_engine/include)
-endif()
-
 target_include_directories(OmniboxLauncher PRIVATE 
     ${CMAKE_CURRENT_BINARY_DIR}
-    ${CMAKE_CURRENT_SOURCE_DIR}/../rust_engine/include
     ${CXXBRIDGE_INCLUDE_DIR}
 )
 
