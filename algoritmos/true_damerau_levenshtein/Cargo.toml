@@ -5,6 +5,9 @@ edition = "2021"
 authors = ["Low-Latency Systems Team"]
 description = "High-performance fuzzy search engine with True Damerau-Levenshtein metric"
 license = "MIT"
+[lib]
+name = "fuzzy_search_engine"
+path = "lib.rs"
 
 [dependencies]
 # Unicode handling: grapheme clusters & normalization [[21]][[23]]
