@@ -19,6 +19,7 @@ rayon = "1.8"
 
 # Error handling with derive macro
 thiserror = "1.0"
+rand = "0.8"
 
 # Optional: for benchmarking
 criterion = { version = "0.5", optional = true }

@@ -325,6 +325,7 @@ name = "fuzzy_search_engine"
 version = "0.1.0"
 dependencies = [
  "criterion",
+ "rand",
  "rayon",
  "thiserror",
  "unicode-normalization",
