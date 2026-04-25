@@ -1,4 +1,3 @@
-```
 # Compiled and build artifacts
 *.o
 *.obj
@@ -44,4 +43,6 @@ htmlcov/
 # System
 .DS_Store
 Thumbs.db
-```
+
+# Data
+*.csv
