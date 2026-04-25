@@ -1,4 +1,3 @@
-use std::sync::Arc;
 use rayon::prelude::*;
 use csv::ReaderBuilder;
 use serde::Deserialize;
@@ -64,7 +63,7 @@ impl SearchMaster {
     }
 
     pub fn buscar(&self, query: &str, algoritmo: ffi::AlgoritmoType) -> Vec<ffi::SearchResult> {
-        let query_str = query.to_lowercase();
+        let _query_str = query.to_lowercase();
         
         // Pre-procesamiento de query según el algoritmo para evitar trabajo redundante en el loop
         let query_shingles = if let ffi::AlgoritmoType::SorensenDice = algoritmo {
@@ -134,6 +133,7 @@ impl SearchMaster {
                             0.0
                         }
                     },
+                    _ => 0.0,
                 };
 
                 ffi::SearchResult {
