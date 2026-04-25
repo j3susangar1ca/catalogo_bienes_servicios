@@ -128,15 +128,16 @@ where
         while let Some(to_insert) = node_to_insert.take() {
             let dist = metric.distance(&current.value, &to_insert.value).raw();
             
-            match current.children.get_mut(&dist) {
-                Some(child) => {
+            use std::collections::hash_map::Entry;
+            match current.children.entry(dist) {
+                Entry::Occupied(entry) => {
                     // Continuar descendiendo en el subárbol existente
-                    current = child.as_mut();
+                    current = entry.into_mut().as_mut();
                     node_to_insert = Some(to_insert);
                 }
-                None => {
+                Entry::Vacant(entry) => {
                     // Insertar directamente como hijo
-                    current.children.insert(dist, to_insert);
+                    entry.insert(to_insert);
                     break;
                 }
             }
@@ -240,16 +241,11 @@ where
 
     /// Obtiene número de elementos indexados (operación O(n), usar con precaución).
     pub fn len(&self) -> usize {
-        Self::count_recursive(&self.root)
+        self.root.as_ref().map_or(0, |n| Self::count_recursive(n))
     }
 
-    fn count_recursive(node: &Option<Box<Node<T>>>) -> usize {
-        match node {
-            None => 0,
-            Some(n) => {
-                1 + n.children.values().map(|c| Self::count_recursive(&Some(c.clone()))).sum::<usize>()
-            }
-        }
+    fn count_recursive(node: &Node<T>) -> usize {
+        1 + node.children.values().map(|c| Self::count_recursive(c)).sum::<usize>()
     }
 
     /// Verifica si el árbol está vacío.
