@@ -72,10 +72,12 @@ impl BitMap {
         if self.blocks.is_empty() {
             return &[];
         }
+        let max_len = self.blocks.len() * 4;
+        let safe_len = self.len.min(max_len);
         unsafe {
             core::slice::from_raw_parts(
                 self.blocks.as_ptr() as *const u64,
-                self.len
+                safe_len
             )
         }
     }
