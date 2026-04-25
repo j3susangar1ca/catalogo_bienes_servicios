@@ -129,7 +129,7 @@ impl SearchMaster {
                 let results = ph_idx.search(query);
                 if !results.is_empty() {
                     return results.into_iter().filter_map(|idx| {
-                        self.catalogo.get(idx).map(|r| ffi::SearchResult {
+                        self.catalogo.get(idx as usize).map(|r| ffi::SearchResult {
                             id: r.id_codigo.clone(),
                             nombre: r.descripcion_articulo.clone(),
                             score: 1.0,
@@ -138,7 +138,7 @@ impl SearchMaster {
                 }
                 let fuzzy_results = ph_idx.fuzzy_search(query, 2);
                 return fuzzy_results.into_iter().filter_map(|(idx, dist)| {
-                    self.catalogo.get(idx).map(|r| ffi::SearchResult {
+                    self.catalogo.get(idx as usize).map(|r| ffi::SearchResult {
                         id: r.id_codigo.clone(),
                         nombre: r.descripcion_articulo.clone(),
                         score: 1.0 - (dist as f64 * 0.3),
