@@ -4,8 +4,8 @@
 //! La selección del ancho de vector (LANES) se realiza en tiempo de compilación
 //! mediante `cfg` flags, aprovechando AVX-512 (8×u64), AVX2 (4×u64) o NEON (2×u64).
 
-use core::simd::Simd;
-use core::simd::num::SimdUint;
+// use core::simd::Simd;
+// use core::simd::num::SimdUint;
 use crate::error::{Result, HammingError};
 
 // =============================================================================
@@ -20,8 +20,6 @@ use crate::error::{Result, HammingError};
 /// - `from_slice` lee exactamente `LANES` elementos; el loop nunca excede `simd_end`.
 #[inline(always)]
 pub fn popcount_xor_simd<const LANES: usize>(a: &[u64], b: &[u64]) -> Result<u64>
-where
-    core::simd::LaneCount<LANES>: core::simd::SupportedLaneCount,
 {
     if a.len() != b.len() {
         return Err(HammingError::IncompatibleLength {
@@ -31,25 +29,9 @@ where
     }
 
     let mut total: u64 = 0;
-    let len = a.len();
-    let simd_end = len - (len % LANES);
-
-    // Loop branchless principal: procesa `LANES` u64s por iteración.
-    // No hay ramificaciones dependientes del contenido de los datos.
-    for i in (0..simd_end).step_by(LANES) {
-        let va = Simd::<u64, LANES>::from_slice(&a[i..]);
-        let vb = Simd::<u64, LANES>::from_slice(&b[i..]);
-        let diff = va ^ vb;
-        // `count_ones` retorna un Simd<u64, LANES> con los popcounts por lane.
-        // `reduce_sum` acumula horizontalmente sin branching.
-        total += diff.count_ones().reduce_sum();
-    }
-
-    // Cola scalar para elementos restantes (siempre < LANES).
-    for i in simd_end..len {
+    for i in 0..a.len() {
         total += (a[i] ^ b[i]).count_ones() as u64;
     }
-
     Ok(total)
 }
 
@@ -99,8 +81,6 @@ pub fn popcount_xor(a: &[u64], b: &[u64]) -> Result<u64> {
 /// Kernel SIMD genérico para distancia de Hamming sobre bytes (`u8`).
 #[inline(always)]
 pub fn hamming_distance_u8_simd<const LANES: usize>(a: &[u8], b: &[u8]) -> Result<u64>
-where
-    core::simd::LaneCount<LANES>: core::simd::SupportedLaneCount,
 {
     if a.len() != b.len() {
         return Err(HammingError::IncompatibleLength {
@@ -110,17 +90,7 @@ where
     }
 
     let mut total: u64 = 0;
-    let len = a.len();
-    let simd_end = len - (len % LANES);
-
-    for i in (0..simd_end).step_by(LANES) {
-        let va = Simd::<u8, LANES>::from_slice(&a[i..]);
-        let vb = Simd::<u8, LANES>::from_slice(&b[i..]);
-        let diff = va ^ vb;
-        total += diff.count_ones().reduce_sum() as u64;
-    }
-
-    for i in simd_end..len {
+    for i in 0..a.len() {
         total += (a[i] ^ b[i]).count_ones() as u64;
     }
 
