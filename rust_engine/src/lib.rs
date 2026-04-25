@@ -66,6 +66,27 @@ impl SearchMaster {
     pub fn buscar(&self, query: &str, algoritmo: ffi::AlgoritmoType) -> Vec<ffi::SearchResult> {
         let query_str = query.to_lowercase();
         
+        // Pre-procesamiento de query según el algoritmo para evitar trabajo redundante en el loop
+        let query_shingles = if let ffi::AlgoritmoType::SorensenDice = algoritmo {
+            Some(sorensen_dice_engine::shingler::generate_shingles(query))
+        } else {
+            None
+        };
+
+        let query_tokens_jaccard = if let ffi::AlgoritmoType::Jaccard = algoritmo {
+            Some(jaccard_engine::tokenizer::tokenize_and_hash(query))
+        } else {
+            None
+        };
+
+        let query_phonetic = if let ffi::AlgoritmoType::Phonetic = algoritmo {
+            let encoder = phonetic_index::phonetic_core::DoubleMetaphone::default();
+            use phonetic_index::phonetic_core::PhoneticEncoder;
+            Some(encoder.encode_primary(query))
+        } else {
+            None
+        };
+
         // Uso de RAYON para paralelismo en tus 8 núcleos
         let mut resultados: Vec<ffi::SearchResult> = self.catalogo.par_iter()
             .filter(|r| r.activo == 1) // Solo productos activos
@@ -73,16 +94,46 @@ impl SearchMaster {
                 let score = match algoritmo {
                     ffi::AlgoritmoType::Hamming => {
                         // Comparamos contra id_codigo
-                        1.0 - (hamming_hpc_engine::calculate_distance(query, &item.id_codigo) as f64 / 10.0)
+                        // Nota: hamming_hpc_engine requiere nightly por portable_simd
+                        hamming_hpc_engine::simd::hamming_distance_u8(query.as_bytes(), item.id_codigo.as_bytes())
+                            .map(|d| 1.0 - (d as f64 / 10.0))
+                            .unwrap_or(0.0)
                     },
                     ffi::AlgoritmoType::DamerauLevenshtein => {
-                        // Tu algoritmo True Damerau-Levenshtein
-                        fuzzy_search_engine::compare(query, &item.descripcion_articulo)
+                        use fuzzy_search_engine::metric::{DistanceMetric, DamerauLevenshtein};
+                        use fuzzy_search_engine::prelude::to_grapheme_clusters;
+                        let metric = DamerauLevenshtein::default();
+                        let a = to_grapheme_clusters(query);
+                        let b = to_grapheme_clusters(&item.descripcion_articulo);
+                        let dist = metric.distance(&a, &b);
+                        fuzzy_search_engine::Similarity::from_distance(dist, a.len().max(b.len())).raw()
                     },
                     ffi::AlgoritmoType::SorensenDice => {
-                        sorensen_dice_engine::calculate(query, &item.descripcion_larga_art)
+                        let item_shingles = sorensen_dice_engine::shingler::generate_shingles(&item.descripcion_larga_art);
+                        if let Some(ref q_shingles) = query_shingles {
+                            sorensen_dice_engine::scoring::dice_similarity(q_shingles, &item_shingles, 0.0).unwrap_or(0.0)
+                        } else {
+                            0.0
+                        }
                     },
-                    _ => 0.0,
+                    ffi::AlgoritmoType::Jaccard => {
+                        let item_tokens = jaccard_engine::tokenizer::tokenize_and_hash(&item.descripcion_articulo);
+                        if let Some(ref q_tokens) = query_tokens_jaccard {
+                            jaccard_engine::set_ops::jaccard(q_tokens, &item_tokens) as f64
+                        } else {
+                            0.0
+                        }
+                    },
+                    ffi::AlgoritmoType::Phonetic => {
+                        let encoder = phonetic_index::phonetic_core::DoubleMetaphone::default();
+                        use phonetic_index::phonetic_core::PhoneticEncoder;
+                        let item_phonetic = encoder.encode_primary(&item.descripcion_articulo);
+                        if let Some(ref q_phonetic) = query_phonetic {
+                            if q_phonetic == &item_phonetic { 1.0 } else { 0.0 }
+                        } else {
+                            0.0
+                        }
+                    },
                 };
 
                 ffi::SearchResult {

@@ -1,3 +1,4 @@
+#![feature(portable_simd)]
 //! # Hamming HPC Engine
 //! 
 //! Motor ultra-eficiente para cálculo de Distancia de Hamming orientado a catálogos
