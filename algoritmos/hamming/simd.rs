@@ -1,7 +1,7 @@
 //! Motor SIMD portable para cálculo de Distancia de Hamming.
 
 use crate::error::{Result, HammingError};
-use std::simd::prelude::*;
+
 
 // =============================================================================
 // POPCOUNT XOR para arrays de u64 (Bit-Flags)
