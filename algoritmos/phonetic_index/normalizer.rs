@@ -15,7 +15,7 @@ use unicode_segmentation::UnicodeSegmentation;
 /// - `ñ` / `Ñ` → `"ny"`
 /// - Vocales acentuadas → vocal base
 /// - `ç` → `"c"`, `ß` → `"ss"`
-/// - Todo carácter no alfabético ASCII se descarta
+/// - Todo carácter no alfanumérico ASCII se descarta
 pub fn normalize(input: &str) -> String {
     let mut result = String::with_capacity(input.len());
 
@@ -33,7 +33,7 @@ pub fn normalize(input: &str) -> String {
 
         for ch in lowered.chars() {
             match ch {
-                'a'..='z' => result.push(ch),
+                'a'..='z' | '0'..='9' => result.push(ch),
                 'á' | 'à' | 'â' | 'ã' | 'ä' | 'å' | 'æ' => result.push('a'),
                 'é' | 'è' | 'ê' | 'ë' => result.push('e'),
                 'í' | 'ì' | 'î' | 'ï' => result.push('i'),
@@ -44,7 +44,7 @@ pub fn normalize(input: &str) -> String {
                     result.push('s');
                     result.push('s');
                 }
-                _ => {} // descarta dígitos, puntuación, marcas combinantes, etc.
+                _ => {} // descarta puntuación, marcas combinantes, etc. (dígitos ahora permitidos)
             }
         }
     }
@@ -80,8 +80,13 @@ mod tests {
     }
 
     #[test]
-    fn non_alpha_removed() {
-        assert_eq!(normalize("SKF-6205/2RS!"), "skfrs");
+    fn preserve_digits() {
+        assert_eq!(normalize("TORNILLO-M10X25"), "tornillom10x25");
+    }
+
+    #[test]
+    fn non_alphanumeric_removed() {
+        assert_eq!(normalize("SKF-6205/2RS!"), "skf62052rs");
     }
 
     #[test]
