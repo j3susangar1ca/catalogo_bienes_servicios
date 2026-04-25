@@ -210,6 +210,7 @@ impl DistanceMetric for DamerauLevenshtein {
 
         for i in 1..=n {
             let mut db = 0;
+            let mut current_row_min = inf;
             for j in 1..=m {
                 let i1 = *da.get(&b[j-1].as_str()).unwrap_or(&0);
                 let j1 = db;
@@ -226,8 +227,16 @@ impl DistanceMetric for DamerauLevenshtein {
                     .min(d[i + 1][j] + 1) // inserción
                     .min(d[i][j + 1] + 1) // eliminación
                     .min(d[i1][j1] + (i - i1 - 1) as u32 + 1 + (j - j1 - 1) as u32); // transposición (True DL)
+                    
+                current_row_min = current_row_min.min(d[i + 1][j + 1]);
             }
             da.insert(a[i-1].as_str(), i);
+            
+            // Early-exit: si el mínimo de la fila excede max_distance, 
+            // podemos podar toda la fila (optimización a nivel de fila)
+            if current_row_min > max_distance {
+                return None;
+            }
         }
 
         let result = d[n + 1][m + 1];
