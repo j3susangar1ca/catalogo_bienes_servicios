@@ -1,10 +1,48 @@
 //! Motor SIMD portable para cálculo de Distancia de Hamming.
 
 use crate::error::{Result, HammingError};
+use core::simd::{Simd, SimdUint, LaneCount, SupportedLaneCount};
 
 // =============================================================================
 // POPCOUNT XOR para arrays de u64 (Bit-Flags)
 // =============================================================================
+
+/// Kernel SIMD real para `popcount(xor)` sobre slices de `u64`.
+/// Carga LANES u64s por iteración, aplica XOR vectorial y acumula popcount por lane.
+#[inline(always)]
+pub fn popcount_xor_simd<const LANES: usize>(a: &[u64], b: &[u64]) -> Result<u64>
+where
+    LaneCount<LANES>: SupportedLaneCount,
+{
+    if a.len() != b.len() {
+        return Err(HammingError::IncompatibleLength {
+            expected: a.len(),
+            found: b.len(),
+        });
+    }
+
+    let mut total: u64 = 0;
+    let mut i = 0;
+    let simd_end = a.len() - (a.len() % LANES);
+
+    // Procesar chunks de LANES elementos con SIMD
+    while i < simd_end {
+        let va = Simd::<u64, LANES>::from_slice(&a[i..i + LANES]);
+        let vb = Simd::<u64, LANES>::from_slice(&b[i..i + LANES]);
+        let xor = va ^ vb;
+        // Popcount por lane y reducción suma
+        total += xor.count_ones().reduce_sum() as u64;
+        i += LANES;
+    }
+
+    // Cola escalar
+    while i < a.len() {
+        total += (a[i] ^ b[i]).count_ones() as u64;
+        i += 1;
+    }
+
+    Ok(total)
+}
 
 #[inline(always)]
 pub fn popcount_xor(a: &[u64], b: &[u64]) -> Result<u64> {
@@ -59,6 +97,43 @@ pub fn popcount_xor(a: &[u64], b: &[u64]) -> Result<u64> {
 // DISTANCIA HAMMING para bytes (SKUs / Strings)
 // =============================================================================
 
+/// Kernel SIMD real para distancia Hamming sobre slices de `u8`.
+/// Carga LANES u8s por iteración, aplica XOR vectorial y acumula popcount por lane.
+#[inline(always)]
+pub fn hamming_distance_u8_simd<const LANES: usize>(a: &[u8], b: &[u8]) -> Result<u64>
+where
+    LaneCount<LANES>: SupportedLaneCount,
+{
+    if a.len() != b.len() {
+        return Err(HammingError::IncompatibleLength {
+            expected: a.len(),
+            found: b.len(),
+        });
+    }
+
+    let mut total: u64 = 0;
+    let mut i = 0;
+    let simd_end = a.len() - (a.len() % LANES);
+
+    // Procesar chunks de LANES elementos con SIMD
+    while i < simd_end {
+        let va = Simd::<u8, LANES>::from_slice(&a[i..i + LANES]);
+        let vb = Simd::<u8, LANES>::from_slice(&b[i..i + LANES]);
+        let xor = va ^ vb;
+        // Popcount por lane y reducción suma
+        total += xor.count_ones().reduce_sum() as u64;
+        i += LANES;
+    }
+
+    // Cola escalar
+    while i < a.len() {
+        total += (a[i] ^ b[i]).count_ones() as u64;
+        i += 1;
+    }
+
+    Ok(total)
+}
+
 #[inline(always)]
 pub fn hamming_distance_u8(a: &[u8], b: &[u8]) -> Result<u64> {
     if a.len() != b.len() {
@@ -105,15 +180,4 @@ pub fn hamming_distance_u8(a: &[u8], b: &[u8]) -> Result<u64> {
     }
 
     Ok(total)
-}
-
-// Mantener las funciones _simd para compatibilidad si se usan en otros lugares
-#[inline(always)]
-pub fn popcount_xor_simd<const LANES: usize>(a: &[u64], b: &[u64]) -> Result<u64> {
-    popcount_xor(a, b)
-}
-
-#[inline(always)]
-pub fn hamming_distance_u8_simd<const LANES: usize>(a: &[u8], b: &[u8]) -> Result<u64> {
-    hamming_distance_u8(a, b)
 }

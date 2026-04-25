@@ -402,10 +402,10 @@ impl HnswIndex {
             .into_iter()
             .take(top_k)
             .map(|i| {
-                let d = dist(catalog.get(i), query);
-                // Convertimos distancia euclídea a similitud coseno aproximada
-                // (válido cuando los vectores están normalizados: cos ≈ 1 - d²/2).
-                let score = 1.0 - d / 2.0;
+                let d_sq = dist_squared(catalog.get(i), query);
+                // Convertimos distancia euclídea cuadrada a similitud coseno aproximada
+                // (válido cuando los vectores están normalizados: cos ≈ 1 - ||a-b||²/2).
+                let score = 1.0 - d_sq / 2.0;
                 SearchResult {
                     index: i,
                     label: catalog.labels[i].clone(),
@@ -419,9 +419,16 @@ impl HnswIndex {
 // ─────────────────────────────────────────────────────────────
 //  UTILIDAD: distancia euclídea cuadrada (sin sqrt para comparar)
 // ─────────────────────────────────────────────────────────────
+/// Distancia euclídea al cuadrado entre dos vectores.
+/// No aplica sqrt() porque para comparaciones en HNSW solo se necesita monotonicidad.
+/// Esto ahorra ~10-20 ciclos por llamada, crítico en búsquedas de millones de vectores.
+#[inline(always)]
+fn dist_squared(a: &[f32], b: &[f32]) -> f32 {
+    a.iter().zip(b.iter()).map(|(x, y)| (x - y) * (x - y)).sum::<f32>()
+}
+
+// Alias para compatibilidad con código existente que llama a `dist`
 #[inline(always)]
 fn dist(a: &[f32], b: &[f32]) -> f32 {
-    // Para vectores normalizados: ‖A-B‖² = 2 - 2·(A·B) → monotónico con coseno.
-    // Retornamos distancia cuadrada (L2²) para evitar sqrt() innecesario.
-    a.iter().zip(b.iter()).map(|(x, y)| (x - y) * (x - y)).sum::<f32>()
+    dist_squared(a, b)
 }

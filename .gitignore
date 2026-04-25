@@ -1,56 +1,63 @@
 ```
-# Rust-specific ignores
-target/
-Cargo.lock
-**/*.rs.bk
-**/*.tmp
+# Compiled and build artifacts
+*.o
+*.obj
+*.exe
+*.dll
+*.so
+*.a
+*.out
 
 # Dependencies
-**/node_modules/
-**/.venv/
-**/venv/
-**/__pycache__/
-**/.mypy_cache/
-**/.pytest_cache/
-**/.gradle/
+target/
 **/target/
 
-# Compiled/build artifacts
-**/dist/
-**/build/
-**/*.pyc
-**/*.class
-**/*.o
-**/*.exe
-**/*.dll
-**/*.so
-**/*.a
-**/*.obj
-**/*.out
-
 # Logs and temp files
-**/*.log
-**/*.tmp
-**/*.swp
-**/*.swo
+*.log
+*.tmp
+*.swp
 
-# Environment files
-**/.env
-**/.env.local
-**/*.env.*
+# Editors
+.vscode/
+.idea/
 
-# Editors/IDE
-**/.vscode/
-**/.idea/
-**/*.swp
-**/*.swo
+# Coverage reports
+coverage/
+htmlcov/
+.coverage
 
-# Coverage
-**/coverage/
-**/htmlcov/
-**/.coverage
+# MyPy cache
+.mypy_cache/
 
-# System files
-**/.DS_Store
-**/Thumbs.db
+# Pytest cache
+.pytest_cache/
+
+# Python virtual environments
+.venv/
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Node.js
+node_modules/
+
+# Gradle
+.gradle/
+build/
+
+# Temporary files
+*.tmp
+*~
+.DS_Store
+Thumbs.db
+
+# Environment variables
+.env
+.env.local
+*.env.*
+
+# Rust specific
+Cargo.lock
 ```
