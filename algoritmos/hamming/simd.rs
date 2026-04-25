@@ -2,7 +2,6 @@
 
 use crate::error::{Result, HammingError};
 use std::simd::prelude::*;
-use std::simd::{LaneCount, SupportedLaneCount};
 
 // =============================================================================
 // POPCOUNT XOR para arrays de u64 (Bit-Flags)
@@ -12,8 +11,6 @@ use std::simd::{LaneCount, SupportedLaneCount};
 /// Carga LANES u64s por iteración, aplica XOR vectorial y acumula popcount por lane.
 #[inline(always)]
 pub fn popcount_xor_simd<const LANES: usize>(a: &[u64], b: &[u64]) -> Result<u64>
-where
-    LaneCount<LANES>: SupportedLaneCount,
 {
     if a.len() != b.len() {
         return Err(HammingError::IncompatibleLength {
@@ -102,8 +99,6 @@ pub fn popcount_xor(a: &[u64], b: &[u64]) -> Result<u64> {
 /// Carga LANES u8s por iteración, aplica XOR vectorial y acumula popcount por lane.
 #[inline(always)]
 pub fn hamming_distance_u8_simd<const LANES: usize>(a: &[u8], b: &[u8]) -> Result<u64>
-where
-    LaneCount<LANES>: SupportedLaneCount,
 {
     if a.len() != b.len() {
         return Err(HammingError::IncompatibleLength {
