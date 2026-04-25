@@ -2,6 +2,8 @@
 #include <QQmlApplicationEngine>
 #include <QQmlContext>
 #include <QDir>
+#include <QFile>
+#include <QDebug>
 #include "SearchModel.h"
 
 int main(int argc, char *argv[]) {
@@ -18,9 +20,28 @@ int main(int argc, char *argv[]) {
     QQmlApplicationEngine engine;
 
     // 2. Cargamos la interfaz QML
-    // Cargamos desde el sistema de recursos de Qt (compilado vía qt_add_qml_module)
-    // Cuando QTP0001 no está establecido, el prefijo por defecto es qrc:/URI/
-    const QUrl url(u"qrc:/TheOmnibox/Main.qml"_qs);
+    // Estrategia: buscar QML relativo al binario, luego en QRC, luego fallar
+    QStringList searchPaths = {
+        QCoreApplication::applicationDirPath() + "/qml/Main.qml",
+        QCoreApplication::applicationDirPath() + "/../frontend/Main.qml",
+        QStringLiteral("qrc:/TheOmnibox/Main.qml")
+    };
+
+    QUrl url;
+    for (const auto& path : searchPaths) {
+        if (path.startsWith(QStringLiteral("qrc:"))) {
+            url = QUrl(path);
+            break;
+        } else if (QFile::exists(path)) {
+            url = QUrl::fromLocalFile(path);
+            break;
+        }
+    }
+
+    if (url.isEmpty()) {
+        qCritical() << "Main.qml not found in any search path:" << searchPaths;
+        return -1;
+    }
     
     QObject::connect(&engine, &QQmlApplicationEngine::objectCreated,
                      &app, [url](QObject *obj, const QUrl &objUrl) {
