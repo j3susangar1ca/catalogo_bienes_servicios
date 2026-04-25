@@ -16,4 +16,4 @@ opt-level = 3
 lto = "fat"
 codegen-units = 1
 panic = "abort"
-target-cpu = "native" # Vital para que aproveche el AVX2 de tu i7-9700
+# target-cpu = "native" # No es válido aquí, mover a .cargo/config.toml si es necesario
