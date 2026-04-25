@@ -10,7 +10,7 @@ set(CMAKE_AUTOUIC ON)
 
 # Buscar Qt 6 y Kirigami
 find_package(Qt6 REQUIRED COMPONENTS Core Gui Quick QuickControls2 QuickLayouts QuickEffects Widgets)
-find_package(KF6 REQUIRED COMPONENTS Kirigami)
+find_package(KF6Kirigami REQUIRED)
 
 # El ejecutable
 qt_add_executable(OmniboxLauncher
