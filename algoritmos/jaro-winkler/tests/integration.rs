@@ -1,11 +1,9 @@
-#[cfg(test)]
-mod tests {
-    use super::*;
+use jaro_winkler_engine::*;
 
-    // Instancia estándar de la industria
-    fn get_matcher() -> JaroWinklerMatcher {
-        JaroWinklerMatcher::new(0.1, 4).unwrap()
-    }
+// Instancia estándar de la industria
+fn get_matcher() -> JaroWinklerMatcher {
+    JaroWinklerMatcher::new(0.1, 4).unwrap()
+}
 
     #[test]
     fn test_brand_normalizer() {
