@@ -100,12 +100,12 @@ impl DamerauLevenshtein {
 
     /// Calcula costo de sustitución con ponderación dinámica.
     #[inline]
-    fn substitution_cost(a: &str, b: &str) -> f64 {
+    fn substitution_cost(&self, a: &str, b: &str) -> f64 {
         if a.len() == 1 && b.len() == 1 {
             let ca = a.chars().next().unwrap();
             let cb = b.chars().next().unwrap();
             if is_numeric_ascii(ca) && is_numeric_ascii(cb) && ca != cb {
-                2.0 // Peso mayor para errores en dígitos (críticos en IDs, códigos)
+                self.numeric_substitution_weight
             } else {
                 1.0
             }
@@ -116,19 +116,19 @@ impl DamerauLevenshtein {
 
     /// Calcula costo de transposición con validación alfabética.
     #[inline]
-    fn transposition_cost(a_prev: &str, a_curr: &str, b_prev: &str, b_curr: &str) -> Option<f64> {
+    fn transposition_cost(&self, a_prev: &str, a_curr: &str, b_prev: &str, b_curr: &str) -> f64 {
         if a_prev == b_curr && a_curr == b_prev {
             // Solo aplica peso especial si son caracteres alfabéticos
             if a_prev.len() == 1 && a_curr.len() == 1 {
                 let c1 = a_prev.chars().next().unwrap();
                 let c2 = a_curr.chars().next().unwrap();
                 if is_alphabetic_ascii(c1) && is_alphabetic_ascii(c2) {
-                    return Some(1.0); // Transposición alfabética estándar
+                    return self.alpha_transposition_weight;
                 }
             }
-            Some(1.0) // Transposición genérica
+            1.0 // Transposición genérica
         } else {
-            None
+            1.0
         }
     }
 }

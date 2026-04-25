@@ -14,6 +14,7 @@ pub fn popcount_xor(a: &[u64], b: &[u64]) -> Result<u64> {
     }
 
     let mut total: u64 = 0;
+    #[allow(unused_mut)]
     let mut i = 0;
     let len = a.len();
 
@@ -66,6 +67,7 @@ pub fn hamming_distance_u8(a: &[u8], b: &[u8]) -> Result<u64> {
     }
 
     let mut total: u64 = 0;
+    #[allow(unused_mut)]
     let mut i = 0;
     let len = a.len();
 
