@@ -29,6 +29,7 @@ qt_add_qml_module(OmniboxLauncher
 # Buscar dinámicamente el directorio de cxxbridge generado por Cargo
 execute_process(
     COMMAND find ${CMAKE_CURRENT_SOURCE_DIR}/../target -path "*/rust_engine-*/out/cxxbridge/include"
+    COMMAND head -n 1
     OUTPUT_VARIABLE CXXBRIDGE_INCLUDE_DIR
     OUTPUT_STRIP_TRAILING_WHITESPACE
 )
