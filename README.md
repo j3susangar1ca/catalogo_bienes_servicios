@@ -1,6 +1,3 @@
-Primero, analizo el repositorio para entender su estructura y contenido.Now I have a complete understanding of the repository. Let me generate the README.Archivo generado. A continuación el bloque listo para copiar:
-
-````markdown
 <div align="center">
 
 # Catálogo de Bienes y Servicios
@@ -100,7 +97,8 @@ graph TB
 
 ### Estructura del Workspace
 ```
-````
+
+```
 
 catalogo_bienes_servicios/
 ├── Cargo.toml # Workspace root (8 members)
@@ -124,7 +122,7 @@ catalogo_bienes_servicios/
 ├── catalogo.csv # Dataset: 65,900 registros
 └── rust-toolchain.toml # Nightly channel
 
-````
+```
 
 ---
 
@@ -132,16 +130,16 @@ catalogo_bienes_servicios/
 
 ### Prerrequisitos
 
-| Dependencia | Mínimo | Verificación |
-|---|---|
-| Rust nightly | `1.78+` | `rustup show` |
-| CMake | `3.25+` | `cmake --version` |
-| Qt6 | `6.x` | `qmake6 --version` |
-| KF6 Kirigami | `6.x` | `pkg-config --modversion KF6Kirigami` |
+| Dependencia  | Mínimo  | Verificación                          |
+| ------------ | ------- | ------------------------------------- |
+| Rust nightly | `1.78+` | `rustup show`                         |
+| CMake        | `3.25+` | `cmake --version`                     |
+| Qt6          | `6.x`   | `qmake6 --version`                    |
+| KF6 Kirigami | `6.x`   | `pkg-config --modversion KF6Kirigami` |
 
 ### Compilación del Motor Rust
 
-```bash
+````bash
 # Clonar el repositorio
 git clone https://github.com/j3susangar1ca/catalogo_bienes_servicios.git
 cd catalogo_bienes_servicios
