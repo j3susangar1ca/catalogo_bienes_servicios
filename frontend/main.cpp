@@ -19,7 +19,8 @@ int main(int argc, char *argv[]) {
     // 2. Cargamos la interfaz QML
     // Nota: Ajusta esta ruta si tu Main.qml está en otro lado. 
     // Usamos ruta absoluta temporal para garantizar que funcione al primer intento.
-    const QUrl url(QStringLiteral("file:///home/jesuslangarica/catalogo_bienes_servicios/frontend/Main.qml"));
+    // Usamos ruta relativa al ejecutable para mayor portabilidad.
+    const QUrl url = QUrl::fromLocalFile(QCoreApplication::applicationDirPath() + "/Main.qml");
     
     QObject::connect(&engine, &QQmlApplicationEngine::objectCreated,
                      &app, [url](QObject *obj, const QUrl &objUrl) {
