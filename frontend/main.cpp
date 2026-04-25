@@ -1,6 +1,7 @@
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
 #include <QQmlContext>
+#include <QDir>
 #include "SearchModel.h"
 
 int main(int argc, char *argv[]) {
@@ -17,10 +18,9 @@ int main(int argc, char *argv[]) {
     QQmlApplicationEngine engine;
 
     // 2. Cargamos la interfaz QML
-    // Nota: Ajusta esta ruta si tu Main.qml está en otro lado. 
-    // Usamos ruta absoluta temporal para garantizar que funcione al primer intento.
-    // Usamos ruta relativa al ejecutable para mayor portabilidad.
-    const QUrl url = QUrl::fromLocalFile(QCoreApplication::applicationDirPath() + "/Main.qml");
+    // Ruta relativa al ejecutable para mayor portabilidad
+    QString qmlPath = QDir::cleanPath(QCoreApplication::applicationDirPath() + "/Main.qml");
+    const QUrl url = QUrl::fromLocalFile(qmlPath);
     
     QObject::connect(&engine, &QQmlApplicationEngine::objectCreated,
                      &app, [url](QObject *obj, const QUrl &objUrl) {

@@ -220,7 +220,9 @@ impl SearchMaster {
                         }
                     },
                     ffi::AlgoritmoType::JaroWinkler => {
-                        jaro_winkler_engine::jaro_winkler(query, &item.descripcion_articulo)
+                        use jaro_winkler_engine::JaroWinklerMatcher;
+                        let matcher = JaroWinklerMatcher::new(0.1, 4).unwrap_or(JaroWinklerMatcher { p: 0.1, l: 4 });
+                        matcher.similarity(query, &item.descripcion_articulo).unwrap_or(0.0)
                     },
                     ffi::AlgoritmoType::Cosine => {
                         // El score de Coseno se maneja de forma especial mediante HNSW
@@ -247,10 +249,17 @@ impl SearchMaster {
                 let q_emb = backend.encode(query);
                 
                 let hnsw_results = hnsw.search(cat, q_emb.as_slice(), 50, 200);
-                return hnsw_results.into_iter().map(|res| ffi::SearchResult {
-                    id: res.label,
-                    nombre: String::new(), // HNSW no guarda el nombre original en el mock, solo el ID
-                    score: res.score as f64,
+                return hnsw_results.into_iter().map(|res| {
+                    // Buscar el nombre original del catálogo usando el ID
+                    let nombre = self.catalogo.iter()
+                        .find(|r| r.id_codigo == res.label)
+                        .map(|r| r.descripcion_articulo.clone())
+                        .unwrap_or_default();
+                    ffi::SearchResult {
+                        id: res.label,
+                        nombre,
+                        score: res.score as f64,
+                    }
                 }).collect();
             }
         }

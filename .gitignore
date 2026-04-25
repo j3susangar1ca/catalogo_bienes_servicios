@@ -7,57 +7,41 @@
 *.so
 *.a
 *.out
+build/
+dist/
+target/
 
 # Dependencies
-target/
-**/target/
-
-# Logs and temp files
-*.log
-*.tmp
-*.swp
+node_modules/
+venv/
+.venv/
+__pycache__/
+.mypy_cache/
+.pytest_cache/
+.gradle/
+cargo/
 
 # Editors
 .vscode/
 .idea/
-
-# Coverage reports
-coverage/
-htmlcov/
-.coverage
-
-# MyPy cache
-.mypy_cache/
-
-# Pytest cache
-.pytest_cache/
-
-# Python virtual environments
-.venv/
-venv/
-__pycache__/
-*.pyc
-*.pyo
-*.pyd
-
-# Node.js
-node_modules/
-
-# Gradle
-.gradle/
-build/
-
-# Temporary files
+*.swp
+*.swo
 *.tmp
-*~
-.DS_Store
-Thumbs.db
 
-# Environment variables
+# Logs
+*.log
+
+# Environment
 .env
 .env.local
 *.env.*
 
-# Rust specific
-Cargo.lock
+# Coverage
+coverage/
+htmlcov/
+.coverage
+
+# System
+.DS_Store
+Thumbs.db
 ```

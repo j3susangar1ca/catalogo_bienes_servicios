@@ -27,20 +27,46 @@ qt_add_qml_module(OmniboxLauncher
 )
 
 # Enlace de librerías
+# Buscar dinámicamente la librería de Rust (debug o release)
+find_file(RUST_ENGINE_LIB
+    NAMES librust_engine.a
+    PATHS ${CMAKE_CURRENT_SOURCE_DIR}/../target/debug
+          ${CMAKE_CURRENT_SOURCE_DIR}/../target/release
+    NO_DEFAULT_PATH
+)
+
+if(NOT RUST_ENGINE_LIB)
+    message(FATAL_ERROR "Could not find librust_engine.a. Run `cargo build` first.")
+endif()
+
 target_link_libraries(OmniboxLauncher PRIVATE
     Qt6::Quick
     Qt6::QuickControls2
     Qt6::QuickLayouts
     Qt6::QuickEffects
     Qt6::Widgets
-    ${CMAKE_CURRENT_SOURCE_DIR}/../target/debug/librust_engine.a
+    ${RUST_ENGINE_LIB}
     dl rt m pthread
 )
 
-# Ruta para encontrar lib.rs.h (generada y exportada por build.rs)
+# Ruta para encontrar lib.rs.h y cxxbridge headers
+# Buscar dinámicamente el directorio de cxxbridge include
+execute_process(
+    COMMAND find ${CMAKE_CURRENT_SOURCE_DIR}/../target -type d -path "*/rust_engine-*/out/cxxbridge/include"
+    OUTPUT_VARIABLE CXXBRIDGE_INCLUDE_DIR
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+    LIMIT_COUNT 1
+)
+
+if(NOT CXXBRIDGE_INCLUDE_DIR)
+    # Fallback: usar el directorio include estándar de rust_engine
+    set(CXXBRIDGE_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../rust_engine/include)
+endif()
+
 target_include_directories(OmniboxLauncher PRIVATE 
     ${CMAKE_CURRENT_BINARY_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}/../rust_engine/include
+    ${CXXBRIDGE_INCLUDE_DIR}
 )
 
 # Optimizaciones para CPU i7-9700
