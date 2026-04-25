@@ -218,7 +218,7 @@ impl SearchMaster {
                     },
                     ffi::AlgoritmoType::JaroWinkler => {
                         use jaro_winkler_engine::JaroWinklerMatcher;
-                        let matcher = JaroWinklerMatcher::new(0.1, 4).unwrap_or(JaroWinklerMatcher { p: 0.1, l: 4 });
+                        let matcher = JaroWinklerMatcher::new(0.1, 4).expect("Invalid Jaro-Winkler config");
                         matcher.similarity(query, &item.descripcion_articulo).unwrap_or(0.0)
                     },
                     _ => 0.0,
