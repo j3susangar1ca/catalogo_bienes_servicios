@@ -1,0 +1,3 @@
+/home/jesuslangarica/catalogo_bienes_servicios/frontend/build/_deps/corrosion-subbuild/CMakeFiles/corrosion-populate.dir
+/home/jesuslangarica/catalogo_bienes_servicios/frontend/build/_deps/corrosion-subbuild/CMakeFiles/edit_cache.dir
+/home/jesuslangarica/catalogo_bienes_servicios/frontend/build/_deps/corrosion-subbuild/CMakeFiles/rebuild_cache.dir

@@ -252,6 +252,69 @@ CMAKE_TAPI:FILEPATH=CMAKE_TAPI-NOTFOUND
 // Studio IDE projects all commands are done without /nologo.
 CMAKE_VERBOSE_MAKEFILE:BOOL=FALSE
 
+//Build Corrosion test project
+CORROSION_BUILD_TESTS:BOOL=OFF
+
+//Enables some additional features if you're developing Corrosion
+CORROSION_DEV_MODE:BOOL=OFF
+
+//Use prebuilt, non-bootstrapped corrosion-generator
+CORROSION_GENERATOR_EXECUTABLE:STRING=
+
+//Controls whether corrosion-generator is installed with the package
+CORROSION_INSTALL_EXECUTABLE:BOOL=OFF
+
+//Use native tooling - Required on CMake < 3.19 and available as
+// a fallback option for recent versions
+CORROSION_NATIVE_TOOLING:BOOL=OFF
+
+//Surpresses a warning if the parsing the target triple failed.
+CORROSION_NO_WARN_PARSE_TARGET_TRIPLE_FAILED:BOOL=OFF
+
+//Respect the CMake target properties specifying the output directory
+// of a target, such as
+//\n    `RUNTIME_OUTPUT_DIRECTORY`. This requires CMake >= 3.19,
+// otherwise this option is forced off.
+CORROSION_RESPECT_OUTPUT_DIRECTORY:BOOL=ON
+
+//Enables verbose output from Corrosion and Cargo
+CORROSION_VERBOSE_OUTPUT:BOOL=OFF
+
+//Do not change this
+COR_IS_MULTI_CONFIG:BOOL=0
+
+//Value Computed by CMake
+Corrosion_BINARY_DIR:STATIC=/home/jesuslangarica/catalogo_bienes_servicios/frontend/build/_deps/corrosion-build
+
+//Value Computed by CMake
+Corrosion_IS_TOP_LEVEL:STATIC=OFF
+
+//Value Computed by CMake
+Corrosion_SOURCE_DIR:STATIC=/home/jesuslangarica/catalogo_bienes_servicios/frontend/build/_deps/corrosion-src
+
+//Directory under which to collect all populated content
+FETCHCONTENT_BASE_DIR:PATH=/home/jesuslangarica/catalogo_bienes_servicios/frontend/build/_deps
+
+//Disables all attempts to download or update content and assumes
+// source dirs already exist
+FETCHCONTENT_FULLY_DISCONNECTED:BOOL=OFF
+
+//Enables QUIET option for all content population
+FETCHCONTENT_QUIET:BOOL=ON
+
+//When not empty, overrides where to find pre-populated content
+// for Corrosion
+FETCHCONTENT_SOURCE_DIR_CORROSION:PATH=
+
+//Enables UPDATE_DISCONNECTED behavior for all content population
+FETCHCONTENT_UPDATES_DISCONNECTED:BOOL=OFF
+
+//Enables UPDATE_DISCONNECTED behavior just for population of Corrosion
+FETCHCONTENT_UPDATES_DISCONNECTED_CORROSION:BOOL=OFF
+
+//Git command line client
+GIT_EXECUTABLE:FILEPATH=/usr/bin/git
+
 //The directory containing a CMake configuration file for KF6.
 KF6_DIR:PATH=KF6_DIR-NOTFOUND
 
@@ -378,6 +441,16 @@ Qt6Quick_DIR:PATH=/usr/lib64/cmake/Qt6Quick
 
 //The directory containing a CMake configuration file for Qt6.
 Qt6_DIR:PATH=/usr/lib64/cmake/Qt6
+
+//Indicates whether to descend into the toolchain pointed to by
+// rustup
+Rust_RESOLVE_RUSTUP_TOOLCHAINS:BOOL=ON
+
+//Path to a program.
+Rust_RUSTUP:FILEPATH=/home/jesuslangarica/.cargo/bin/rustup
+
+//The rustup toolchain to use
+Rust_TOOLCHAIN:STRING=
 
 //Path to a program.
 Vulkan_GLSLANG_VALIDATOR_EXECUTABLE:FILEPATH=Vulkan_GLSLANG_VALIDATOR_EXECUTABLE-NOTFOUND
@@ -516,7 +589,7 @@ CMAKE_MODULE_LINKER_FLAGS_RELWITHDEBINFO-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_NM
 CMAKE_NM-ADVANCED:INTERNAL=1
 //number of local generators
-CMAKE_NUMBER_OF_MAKEFILES:INTERNAL=1
+CMAKE_NUMBER_OF_MAKEFILES:INTERNAL=2
 //ADVANCED property for variable: CMAKE_OBJCOPY
 CMAKE_OBJCOPY-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_OBJDUMP
@@ -561,8 +634,16 @@ CMAKE_TAPI-ADVANCED:INTERNAL=1
 CMAKE_UNAME:INTERNAL=/usr/bin/uname
 //ADVANCED property for variable: CMAKE_VERBOSE_MAKEFILE
 CMAKE_VERBOSE_MAKEFILE-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: CORROSION_GENERATOR_EXECUTABLE
+CORROSION_GENERATOR_EXECUTABLE-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: CORROSION_INSTALL_EXECUTABLE
+CORROSION_INSTALL_EXECUTABLE-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: COR_IS_MULTI_CONFIG
+COR_IS_MULTI_CONFIG-ADVANCED:INTERNAL=1
 //Details about finding OpenGL
 FIND_PACKAGE_MESSAGE_DETAILS_OpenGL:INTERNAL=[/usr/lib64/libOpenGL.so][/usr/lib64/libGLX.so][/usr/include][c ][v()]
+//Details about finding Rust
+FIND_PACKAGE_MESSAGE_DETAILS_Rust:INTERNAL=[/bin/rustc][1.94.1][/bin/cargo][1.94.1][x86_64-unknown-linux-gnu][x86_64-unknown-linux-gnu][v1.94.1()]
 //Details about finding Threads
 FIND_PACKAGE_MESSAGE_DETAILS_Threads:INTERNAL=[TRUE][v()]
 //Details about finding WrapAtomic
@@ -571,6 +652,8 @@ FIND_PACKAGE_MESSAGE_DETAILS_WrapAtomic:INTERNAL=[1][v()]
 FIND_PACKAGE_MESSAGE_DETAILS_WrapOpenGL:INTERNAL=[ON][v()]
 //Details about finding WrapVulkanHeaders
 FIND_PACKAGE_MESSAGE_DETAILS_WrapVulkanHeaders:INTERNAL=[/usr/include][v()]
+//ADVANCED property for variable: GIT_EXECUTABLE
+GIT_EXECUTABLE-ADVANCED:INTERNAL=1
 //Test HAVE_STDATOMIC
 HAVE_STDATOMIC:INTERNAL=1
 //ADVANCED property for variable: OPENGL_EGL_INCLUDE_DIR
@@ -1434,6 +1517,52 @@ QT_FEATURE_xmlstreamwriter:INTERNAL=ON
 QT_FEATURE_xrender:INTERNAL=OFF
 //Qt feature: zstd (from target Qt6::Core)
 QT_FEATURE_zstd:INTERNAL=ON
+//Internal cache of Rust_CARGO
+Rust_CARGO_CACHED:INTERNAL=/bin/cargo
+//Host architecture
+Rust_CARGO_HOST_ARCH:INTERNAL=x86_64
+//Host environment
+Rust_CARGO_HOST_ENV:INTERNAL=gnu
+//Host Operating System
+Rust_CARGO_HOST_OS:INTERNAL=linux
+//Internal cache of Rust_CARGO_HOST_TARGET
+Rust_CARGO_HOST_TARGET_CACHED:INTERNAL=x86_64-unknown-linux-gnu
+//Host vendor
+Rust_CARGO_HOST_VENDOR:INTERNAL=unknown
+//Target architecture
+Rust_CARGO_TARGET_ARCH:INTERNAL=x86_64
+//Internal cache of Rust_CARGO_TARGET
+Rust_CARGO_TARGET_CACHED:INTERNAL=x86_64-unknown-linux-gnu
+//Target environment
+Rust_CARGO_TARGET_ENV:INTERNAL=gnu
+//Required native libraries when linking Rust static libraries
+Rust_CARGO_TARGET_LINK_NATIVE_LIBS:INTERNAL=gcc_s;util;rt;pthread;m;dl;c
+//Required link flags when linking Rust static libraries
+Rust_CARGO_TARGET_LINK_OPTIONS:INTERNAL=
+//Target Operating System
+Rust_CARGO_TARGET_OS:INTERNAL=linux
+//Target vendor
+Rust_CARGO_TARGET_VENDOR:INTERNAL=unknown
+Rust_CARGO_VERSION:INTERNAL=1.94.1
+Rust_CARGO_VERSION_MAJOR:INTERNAL=1
+Rust_CARGO_VERSION_MINOR:INTERNAL=94
+Rust_CARGO_VERSION_PATCH:INTERNAL=1
+//Internal cache of Rust_COMPILER
+Rust_COMPILER_CACHED:INTERNAL=/bin/rustc
+//Rust is configured for cross-compiling
+Rust_CROSSCOMPILING:INTERNAL=FALSE
+Rust_IS_NIGHTLY:INTERNAL=0
+Rust_LLVM_VERSION:INTERNAL=21.1.8
+Rust_LLVM_VERSION_MAJOR:INTERNAL=21
+Rust_LLVM_VERSION_MINOR:INTERNAL=1
+Rust_LLVM_VERSION_PATCH:INTERNAL=8
+//STRINGS property for variable: Rust_TOOLCHAIN
+Rust_TOOLCHAIN-STRINGS:INTERNAL=
+Rust_TOOLCHAIN_IS_RUSTUP_MANAGED:INTERNAL=TRUE
+Rust_VERSION:INTERNAL=1.94.1
+Rust_VERSION_MAJOR:INTERNAL=1
+Rust_VERSION_MINOR:INTERNAL=94
+Rust_VERSION_PATCH:INTERNAL=1
 //ADVANCED property for variable: Vulkan_GLSLANG_VALIDATOR_EXECUTABLE
 Vulkan_GLSLANG_VALIDATOR_EXECUTABLE-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: Vulkan_GLSLC_EXECUTABLE
@@ -1442,6 +1571,26 @@ Vulkan_GLSLC_EXECUTABLE-ADVANCED:INTERNAL=1
 Vulkan_INCLUDE_DIR-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: Vulkan_LIBRARY
 Vulkan_LIBRARY-ADVANCED:INTERNAL=1
+//Path to cargo used by corrosion
+_CORROSION_CARGO:INTERNAL=/bin/cargo
+//cargo version used by corrosion
+_CORROSION_CARGO_VERSION:INTERNAL=1.94.1
+_CORROSION_QUIET_OUTPUT_FLAG:INTERNAL=--quiet
+//Path to rustc used by corrosion
+_CORROSION_RUSTC:INTERNAL=/bin/rustc
+//host triple used by corrosion
+_CORROSION_RUST_CARGO_HOST_TARGET:INTERNAL=x86_64-unknown-linux-gnu
+//target triple used by corrosion
+_CORROSION_RUST_CARGO_TARGET:INTERNAL=x86_64-unknown-linux-gnu
+//lowercase target triple with underscores
+_CORROSION_RUST_CARGO_TARGET_UNDERSCORE:INTERNAL=x86_64_unknown_linux_gnu
+//target triple in uppercase with underscore
+_CORROSION_RUST_CARGO_TARGET_UPPER:INTERNAL=X86_64_UNKNOWN_LINUX_GNU
+_CORR_PROP_ALL_FEATURES:INTERNAL=CORROSION_ALL_FEATURES
+_CORR_PROP_ENV_VARS:INTERNAL=CORROSION_ENVIRONMENT_VARIABLES
+_CORR_PROP_FEATURES:INTERNAL=CORROSION_FEATURES
+_CORR_PROP_HOST_BUILD:INTERNAL=CORROSION_USE_HOST_BUILD
+_CORR_PROP_NO_DEFAULT_FEATURES:INTERNAL=CORROSION_NO_DEFAULT_FEATURES
 //CMAKE_INSTALL_PREFIX during last run
 _GNUInstallDirs_LAST_CMAKE_INSTALL_PREFIX:INTERNAL=/usr/local
 __qt_qml_macros_module_base_dir:INTERNAL=/usr/lib64/cmake/Qt6Qml

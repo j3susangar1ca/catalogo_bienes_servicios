@@ -1,0 +1,21 @@
+# ninja log v7
+1	15	1777077189479859635	corrosion-populate-prefix/src/corrosion-populate-stamp/corrosion-populate-mkdir	e827f38371f1f40d
+1	15	1777077189479859635	/home/jesuslangarica/catalogo_bienes_servicios/frontend/build/_deps/corrosion-subbuild/corrosion-populate-prefix/src/corrosion-populate-stamp/corrosion-populate-mkdir	e827f38371f1f40d
+16	1396	1777077190859841092	corrosion-populate-prefix/src/corrosion-populate-stamp/corrosion-populate-download	9093c56fba7b3e8c
+16	1396	1777077190859841092	/home/jesuslangarica/catalogo_bienes_servicios/frontend/build/_deps/corrosion-subbuild/corrosion-populate-prefix/src/corrosion-populate-stamp/corrosion-populate-download	9093c56fba7b3e8c
+1396	1407	1777077190860841078	corrosion-populate-prefix/src/corrosion-populate-stamp/corrosion-populate-update	e8105e9ef3bdefdd
+1396	1407	1777077190860841078	/home/jesuslangarica/catalogo_bienes_servicios/frontend/build/_deps/corrosion-subbuild/corrosion-populate-prefix/src/corrosion-populate-stamp/corrosion-populate-update	e8105e9ef3bdefdd
+1407	1420	1777077190883840769	corrosion-populate-prefix/src/corrosion-populate-stamp/corrosion-populate-patch	5259c357c11a8d70
+1407	1420	1777077190883840769	/home/jesuslangarica/catalogo_bienes_servicios/frontend/build/_deps/corrosion-subbuild/corrosion-populate-prefix/src/corrosion-populate-stamp/corrosion-populate-patch	5259c357c11a8d70
+1420	1433	1777077190896840594	corrosion-populate-prefix/src/corrosion-populate-stamp/corrosion-populate-configure	cd899fb34d2989ca
+1420	1433	1777077190896840594	/home/jesuslangarica/catalogo_bienes_servicios/frontend/build/_deps/corrosion-subbuild/corrosion-populate-prefix/src/corrosion-populate-stamp/corrosion-populate-configure	cd899fb34d2989ca
+1433	1446	1777077190909840420	corrosion-populate-prefix/src/corrosion-populate-stamp/corrosion-populate-build	72e13d39939484e0
+1433	1446	1777077190909840420	/home/jesuslangarica/catalogo_bienes_servicios/frontend/build/_deps/corrosion-subbuild/corrosion-populate-prefix/src/corrosion-populate-stamp/corrosion-populate-build	72e13d39939484e0
+1446	1458	1777077190921840259	corrosion-populate-prefix/src/corrosion-populate-stamp/corrosion-populate-install	5322108954b1f49d
+1446	1458	1777077190921840259	/home/jesuslangarica/catalogo_bienes_servicios/frontend/build/_deps/corrosion-subbuild/corrosion-populate-prefix/src/corrosion-populate-stamp/corrosion-populate-install	5322108954b1f49d
+1458	1470	1777077190933840097	corrosion-populate-prefix/src/corrosion-populate-stamp/corrosion-populate-test	a4714290961ac349
+1458	1470	1777077190933840097	/home/jesuslangarica/catalogo_bienes_servicios/frontend/build/_deps/corrosion-subbuild/corrosion-populate-prefix/src/corrosion-populate-stamp/corrosion-populate-test	a4714290961ac349
+1470	1487	1777077190951839855	CMakeFiles/corrosion-populate-complete	d32fb247a4968c59
+1470	1487	1777077190951839855	corrosion-populate-prefix/src/corrosion-populate-stamp/corrosion-populate-done	d32fb247a4968c59
+1470	1487	1777077190951839855	/home/jesuslangarica/catalogo_bienes_servicios/frontend/build/_deps/corrosion-subbuild/CMakeFiles/corrosion-populate-complete	d32fb247a4968c59
+1470	1487	1777077190951839855	/home/jesuslangarica/catalogo_bienes_servicios/frontend/build/_deps/corrosion-subbuild/corrosion-populate-prefix/src/corrosion-populate-stamp/corrosion-populate-done	d32fb247a4968c59

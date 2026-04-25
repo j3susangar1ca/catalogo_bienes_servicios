@@ -7,8 +7,6 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Buscar Qt 6
 find_package(Qt6 REQUIRED COMPONENTS Quick QuickControls2 QuickLayouts QuickEffects)
-# Buscar Kirigami (KDE)
-find_package(KF6 REQUIRED COMPONENTS Kirigami)
 
 # Integración con Rust vía Corrosion
 include(FetchContent)
@@ -42,7 +40,6 @@ target_link_libraries(Omnibox PRIVATE
     Qt6::QuickControls2
     Qt6::QuickLayouts
     Qt6::QuickEffects
-    KF6::Kirigami
     rust_engine-staticlib
 )
 
