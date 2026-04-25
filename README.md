@@ -19,7 +19,6 @@
 10. [Motor Central — rust_engine (FFI Bridge)](#10-motor-central--rust_engine-ffi-bridge)
 11. [Frontend — Qt6/QML (The Omnibox)](#11-frontend--qt6qml-the-omnibox)
 12. [Análisis de Fallos, Errores y Áreas de Mejora](#12-análisis-de-fallos-errores-y-áreas-de-mejora)
-13. [Fragmentos de Código Corregidos](#13-fragmentos-de-código-corregidos)
 
 ---
 
