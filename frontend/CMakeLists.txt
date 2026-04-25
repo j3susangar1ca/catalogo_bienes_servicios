@@ -37,10 +37,10 @@ target_link_libraries(OmniboxLauncher PRIVATE
     dl rt m pthread
 )
 
-# Ruta para encontrar lib.rs.h (generada por cxx en el target dir de Rust)
+# Ruta para encontrar lib.rs.h (generada y exportada por build.rs)
 target_include_directories(OmniboxLauncher PRIVATE 
     ${CMAKE_CURRENT_BINARY_DIR}
-    ${CMAKE_CURRENT_SOURCE_DIR}/../target/debug/build/rust_engine-32e7661fdbf06cf0/out/cxxbridge/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/../rust_engine/include
 )
 
 # Optimizaciones para CPU i7-9700
