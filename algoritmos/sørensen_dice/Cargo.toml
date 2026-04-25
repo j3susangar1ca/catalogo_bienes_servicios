@@ -1,0 +1,4 @@
+[dependencies]
+unicode-segmentation = "1.10.1"
+ahash = "0.8.3" # Hash no criptográfico extremadamente rápido
+rayon = "1.8.0" # Concurrencia data-parallel

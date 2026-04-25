@@ -1,0 +1,10 @@
+[package]
+name = "phonetic_index"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+rayon = "1.10"
+rustc-hash = "2"
+arrayvec = "0.7"
+unicode-segmentation = "1.11"
