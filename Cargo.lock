@@ -426,7 +426,6 @@ name = "jaccard-engine"
 version = "0.1.0"
 dependencies = [
  "ahash",
- "lazy_static",
  "rayon",
  "unicode-normalization",
  "unicode-segmentation",
@@ -436,6 +435,7 @@ dependencies = [
 name = "jaro-winkler-engine"
 version = "0.1.0"
 dependencies = [
+ "arrayvec",
  "unicode-segmentation",
 ]
 
@@ -448,12 +448,6 @@ dependencies = [
  "once_cell",
  "wasm-bindgen",
 ]
-
-[[package]]
-name = "lazy_static"
-version = "1.5.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "bbd2bcb4c963f2ddae06a2efc7e9f3591312473c50c6685e1f298068316e66fe"
 
 [[package]]
 name = "libc"
@@ -669,6 +663,7 @@ dependencies = [
  "jaro-winkler-engine",
  "phonetic_index",
  "rayon",
+ "semantic_engine",
  "serde",
  "sorensen-dice-engine",
 ]

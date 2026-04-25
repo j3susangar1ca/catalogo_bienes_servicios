@@ -18,7 +18,7 @@ phonetic_index = { path = "../algoritmos/phonetic_index" }
 sorensen_dice_engine = { package = "sorensen-dice-engine", path = "../algoritmos/sørensen_dice" }
 jaccard_engine = { package = "jaccard-engine", path = "../algoritmos/jaccard" }
 jaro_winkler_engine = { package = "jaro-winkler-engine", path = "../algoritmos/jaro-winkler" }
-semantic_engine = { package = "semantic-engine", path = "../algoritmos/similitud_coseno/semantic_engine" }
+semantic_engine = { package = "semantic_engine", path = "../algoritmos/similitud_coseno/semantic_engine" }
 
 [build-dependencies]
 cxx-build = "1.0"
