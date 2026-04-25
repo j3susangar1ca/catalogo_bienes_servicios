@@ -26,6 +26,7 @@ pub struct AlignedVec {
     data: Vec<f32x8>,
 }
 
+#[allow(dead_code)]
 impl AlignedVec {
     /// Crea un nuevo buffer de `dim` elementos, inicializado a cero.
     pub fn zeros(dim: usize) -> Self {
