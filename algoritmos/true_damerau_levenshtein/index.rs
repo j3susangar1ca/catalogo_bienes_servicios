@@ -1,10 +1,7 @@
-use std::cell::RefCell;
-use std::sync::Arc;
 use rayon::prelude::*;
 use crate::metric::DistanceMetric;
-use crate::types::{Distance, Similarity};
-use crate::error::{FuzzySearchError, Result};
-use crate::prelude::{preprocess_text, to_grapheme_clusters};
+use crate::types::Similarity;
+use crate::prelude::preprocess_text;
 
 /// Nodo mutable del BK-Tree para acceso thread-safe con construcción eficiente.
 ///
