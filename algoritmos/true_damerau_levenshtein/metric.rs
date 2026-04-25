@@ -1,3 +1,7 @@
+//! Implementaciones de métricas de distancia (ej: Damerau-Levenshtein).
+//!
+//! Proporciona traits y estructuras para calcular distancias entre secuencias.
+
 use std::collections::HashMap;
 use crate::types::Distance;
 

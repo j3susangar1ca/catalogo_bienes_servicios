@@ -1,5 +1,8 @@
+//! Módulo para normalización de texto y manejo de grafemas.
+//!
+//! Proporciona funciones para procesar texto Unicode correctamente.
+
 use unicode_normalization::UnicodeNormalization;
-use unicode_segmentation::UnicodeSegmentation;
 use crate::error::Result;
 
 /// Normaliza texto a forma NFC para consistencia en comparaciones.

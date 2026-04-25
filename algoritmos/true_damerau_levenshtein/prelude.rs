@@ -1,4 +1,6 @@
 // src/prelude/mod.rs
+//! Re-exportes principales del motor de búsqueda difusa.
+
 use crate::normalization;
 
 pub use normalization::{

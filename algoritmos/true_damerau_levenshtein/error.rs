@@ -1,6 +1,8 @@
-use thiserror::Error;
+//! Definición de errores del motor de búsqueda.
+//!
+//! Contiene el enumerador `FuzzySearchError` y el tipo `Result` personalizado.
 
-/// Errores personalizados para el motor de búsqueda difusa.
+use thiserror::Error;
 ///
 /// Implementa `std::error::Error` para integración con ecosistema Rust.
 #[derive(Error, Debug)]
