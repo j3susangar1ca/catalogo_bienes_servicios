@@ -8,7 +8,9 @@ struct Record {
     id_codigo: String,
     descripcion_articulo: String,
     descripcion_larga_art: String,
+    #[allow(dead_code)]
     unidad_medida: String,
+    #[allow(dead_code)]
     ultimo_precio: String,
     activo: i32,
 }
@@ -89,7 +91,7 @@ impl SearchMaster {
                 // Construcción de BK-Tree para Damerau-Levenshtein
                 let mut bktree: fuzzy_search_engine::index::BKTree<fuzzy_search_engine::metric::DamerauLevenshtein, String> = 
                     fuzzy_search_engine::index::BKTree::new();
-                for (i, record) in self.catalogo.iter().enumerate() {
+                for record in self.catalogo.iter() {
                     bktree.insert(record.descripcion_articulo.clone(), record.id_codigo.clone());
                 }
                 self.bktree_damerau = Some(bktree);

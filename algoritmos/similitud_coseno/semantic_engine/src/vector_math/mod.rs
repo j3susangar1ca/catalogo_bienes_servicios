@@ -10,6 +10,7 @@ use wide::f32x8;
 //  CONSTANTES DE LAYOUT
 // ------------------------------------------------------------
 /// Alineación requerida para cargas AVX2 (32 bytes = 8 × f32).
+#[allow(dead_code)]
 pub const ALIGN: usize = 32;
 /// Dimensión estándar de embeddings BERT-base.
 pub const DIM: usize = 768;
@@ -19,6 +20,7 @@ pub const DIM: usize = 768;
 // ------------------------------------------------------------
 /// Buffer de floats alineado a 32 bytes en HEAP, listo para SIMD.
 /// Garantiza que el puntero a los datos caiga en un boundary de 32 bytes.
+#[allow(dead_code)]
 pub struct AlignedVec {
     // Usamos f32x8 para garantizar que el allocator use alineación de 32 bytes.
     data: Vec<f32x8>,
@@ -85,6 +87,7 @@ pub fn dot_simd(a: &[f32], b: &[f32]) -> f32 {
 /// Versión escalar con auto-vectorización habilitada (fallback portable).
 /// El compilador puede vectorizarla en targets sin `wide` disponible.
 #[inline]
+#[allow(dead_code)]
 pub fn dot_scalar(a: &[f32], b: &[f32]) -> f32 {
     a.iter().zip(b.iter()).map(|(x, y)| x * y).sum()
 }
@@ -117,6 +120,7 @@ pub fn normalize_inplace(v: &mut [f32]) {
 /// Similitud de coseno completa: (A·B) / (‖A‖·‖B‖).
 /// Úsala solo cuando los vectores NO están pre-normalizados.
 #[inline]
+#[allow(dead_code)]
 pub fn cosine_similarity(a: &[f32], b: &[f32]) -> f32 {
     let dot   = dot_simd(a, b);
     let norm_a = l2_norm(a);
