@@ -15,6 +15,7 @@
 
 use std::collections::HashSet;
 use std::hash::{Hash, Hasher};
+use std::sync::OnceLock;
 use std::time::Instant;
 
 use ahash::{AHasher, RandomState};
@@ -35,14 +36,17 @@ pub mod tokenizer {
     ];
 
     /// Conjunto de *stop‑words* para búsqueda O(1).
-    lazy_static::lazy_static! {
-        static ref STOP_SET: HashSet<&'static str> = {
+    /// Usa `OnceLock` de la stdlib (Rust 1.63+) en lugar de `lazy_static!`.
+    static STOP_SET: OnceLock<HashSet<&'static str>> = OnceLock::new();
+
+    fn get_stop_set() -> &'static HashSet<&'static str> {
+        STOP_SET.get_or_init(|| {
             let mut set = HashSet::with_capacity(STOP_WORDS.len());
             for w in STOP_WORDS {
                 set.insert(*w);
             }
             set
-        };
+        })
     }
 
     /// Convierte una cadena de texto en un vector de *hashes* de 64 bits
@@ -66,7 +70,7 @@ pub mod tokenizer {
 
         let mut hashes: Vec<u64> = normalized
             .split(|c: char| !c.is_alphanumeric())
-            .filter(|token| !token.is_empty() && !STOP_SET.contains(token))
+            .filter(|token| !token.is_empty() && !get_stop_set().contains(token))
             .map(|token| hash_builder.hash_one(token))
             .collect();
 

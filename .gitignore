@@ -1,35 +1,56 @@
-# C++ / Build
-frontend/build/
-build/
-CMakeFiles/
-CMakeCache.txt
-cmake_install.cmake
-Makefile
-*.o
-*.a
-*.so
-*.out
-Omnibox
-OmniboxLauncher
-TheOmnibox
-
-# Rust
+```
+# Rust-specific ignores
 target/
+Cargo.lock
 **/*.rs.bk
-# Cargo.lock # Descomentar si es una aplicación final, dejar comentado si es librería
+**/*.tmp
 
-# IDEs / Editors
-.vscode/
-.idea/
-*.swp
-*.swo
-*~
-.kateconfig
+# Dependencies
+**/node_modules/
+**/.venv/
+**/venv/
+**/__pycache__/
+**/.mypy_cache/
+**/.pytest_cache/
+**/.gradle/
+**/target/
 
-# OS
-.DS_Store
-Thumbs.db
+# Compiled/build artifacts
+**/dist/
+**/build/
+**/*.pyc
+**/*.class
+**/*.o
+**/*.exe
+**/*.dll
+**/*.so
+**/*.a
+**/*.obj
+**/*.out
 
-# Project Specific
-*.csv
-backend/datos/catalogo_real.csv
+# Logs and temp files
+**/*.log
+**/*.tmp
+**/*.swp
+**/*.swo
+
+# Environment files
+**/.env
+**/.env.local
+**/*.env.*
+
+# Editors/IDE
+**/.vscode/
+**/.idea/
+**/*.swp
+**/*.swo
+
+# Coverage
+**/coverage/
+**/htmlcov/
+**/.coverage
+
+# System files
+**/.DS_Store
+**/Thumbs.db
+```

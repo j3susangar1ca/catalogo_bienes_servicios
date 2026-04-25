@@ -1,9 +1,10 @@
 //! Motor optimizado de similitud Jaro-Winkler para deduplicación de catálogos.
 //! 
 //! Diseñado para strings cortos (< 64 grafemas) utilizando bitmasking (`u64`) 
-//! para lograr seguimiento de coincidencias con Zero-Allocation.
+//! y `ArrayVec` para lograr seguimiento de coincidencias con Zero-Allocation.
 
 use unicode_segmentation::UnicodeSegmentation;
+use arrayvec::ArrayVec;
 
 /// Puntuación de similitud en formato de precisión doble.
 pub type SimilarityScore = f64;
@@ -50,9 +51,20 @@ impl JaroWinklerMatcher {
 
     /// Calcula la similitud Jaro-Winkler entre dos cadenas.
     pub fn similarity(&self, s1: &str, s2: &str) -> Result<SimilarityScore, JaroWinklerError> {
-        // 1. Descomposición de Graphemes (Unicode-aware)
-        let seq1: Vec<&str> = s1.graphemes(true).collect();
-        let seq2: Vec<&str> = s2.graphemes(true).collect();
+        // 1. Descomposición de Graphemes (Unicode-aware) con ArrayVec para zero-allocation
+        let mut seq1 = ArrayVec::<&str, 64>::new();
+        let mut seq2 = ArrayVec::<&str, 64>::new();
+        
+        for g in s1.graphemes(true) {
+            if seq1.try_push(g).is_err() {
+                return Err(JaroWinklerError::InputTooLong);
+            }
+        }
+        for g in s2.graphemes(true) {
+            if seq2.try_push(g).is_err() {
+                return Err(JaroWinklerError::InputTooLong);
+            }
+        }
 
         let len1 = seq1.len();
         let len2 = seq2.len();
@@ -60,7 +72,7 @@ impl JaroWinklerMatcher {
         // 2. Manejo de casos triviales y límites del hardware (Bitmask u64)
         if len1 == 0 && len2 == 0 { return Ok(1.0); }
         if len1 == 0 || len2 == 0 { return Err(JaroWinklerError::EmptyString); }
-        if len1 > 64 || len2 > 64 { return Err(JaroWinklerError::InputTooLong); }
+        // Nota: El límite de 64 ya está garantizado por ArrayVec arriba
 
         // 3. Early Exit Matemático
         let max_len = len1.max(len2);

@@ -43,6 +43,9 @@ pub struct SearchMaster {
     catalogo: Vec<Record>,
     semantic_catalog: Option<semantic_engine::index::VectorCatalog>,
     hnsw: Option<semantic_engine::index::HnswIndex>,
+    // Índices adicionales para acelerar búsquedas
+    phonetic_index: Option<phonetic_index::PhoneticIndex>,
+    bktree_damerau: Option<fuzzy_search_engine::index::BKTree<fuzzy_search_engine::metric::DamerauLevenshtein, String>>,
 }
 
 impl SearchMaster {
@@ -74,6 +77,22 @@ impl SearchMaster {
                 
                 self.semantic_catalog = Some(semantic_cat);
                 self.hnsw = Some(hnsw);
+                
+                // Construcción de índice fonético para búsquedas O(1)
+                let phonetic_catalog: Vec<(phonetic_index::RecordId, String)> = self.catalogo
+                    .iter()
+                    .enumerate()
+                    .map(|(i, r)| (i as phonetic_index::RecordId, r.descripcion_articulo.clone()))
+                    .collect();
+                self.phonetic_index = Some(phonetic_index::PhoneticIndex::build(&phonetic_catalog));
+                
+                // Construcción de BK-Tree para Damerau-Levenshtein
+                let mut bktree: fuzzy_search_engine::index::BKTree<fuzzy_search_engine::metric::DamerauLevenshtein, String> = 
+                    fuzzy_search_engine::index::BKTree::new();
+                for (i, record) in self.catalogo.iter().enumerate() {
+                    bktree.insert(record.descripcion_articulo.clone(), record.id_codigo.clone());
+                }
+                self.bktree_damerau = Some(bktree);
                 
                 true
             }
@@ -128,13 +147,26 @@ impl SearchMaster {
                         }
                     },
                     ffi::AlgoritmoType::DamerauLevenshtein => {
-                        use fuzzy_search_engine::metric::{DistanceMetric, DamerauLevenshtein};
-                        use fuzzy_search_engine::prelude::to_grapheme_clusters;
-                        let metric = DamerauLevenshtein::default();
-                        let a = to_grapheme_clusters(query);
-                        let b = to_grapheme_clusters(&item.descripcion_articulo);
-                        let dist = metric.distance(&a, &b);
-                        fuzzy_search_engine::Similarity::from_distance(dist, a.len().max(b.len())).raw()
+                        // Usar BK-Tree indexado para búsqueda O(log n) en lugar de O(n)
+                        if let Some(ref bktree) = self.bktree_damerau {
+                            use fuzzy_search_engine::types::Similarity;
+                            let results = bktree.search(query, Similarity::from_threshold(0.85));
+                            // Retornar el score máximo (1.0) ya que BK-Tree filtra por umbral
+                            return results.into_iter().map(|id| ffi::SearchResult {
+                                id,
+                                nombre: String::new(), // El payload es el ID, no el nombre
+                                score: 1.0,
+                            }).collect();
+                        } else {
+                            // Fallback sin índice
+                            use fuzzy_search_engine::metric::{DistanceMetric, DamerauLevenshtein};
+                            use fuzzy_search_engine::prelude::to_grapheme_clusters;
+                            let metric = DamerauLevenshtein::default();
+                            let a = to_grapheme_clusters(query);
+                            let b = to_grapheme_clusters(&item.descripcion_articulo);
+                            let dist = metric.distance(&a, &b);
+                            fuzzy_search_engine::Similarity::from_distance(dist, a.len().max(b.len())).raw()
+                        }
                     },
                     ffi::AlgoritmoType::SorensenDice => {
                         let item_shingles = sorensen_dice_engine::shingler::generate_shingles(&item.descripcion_larga_art);
@@ -153,13 +185,38 @@ impl SearchMaster {
                         }
                     },
                     ffi::AlgoritmoType::Phonetic => {
-                        let encoder = phonetic_index::phonetic_core::DoubleMetaphone::default();
-                        use phonetic_index::phonetic_core::PhoneticEncoder;
-                        let item_phonetic = encoder.encode_primary(&item.descripcion_articulo);
-                        if let Some(ref q_phonetic) = query_phonetic {
-                            if q_phonetic == &item_phonetic { 1.0 } else { 0.0 }
+                        // Usar índice fonético para búsqueda O(1) en lugar de O(n)
+                        if let Some(ref ph_idx) = self.phonetic_index {
+                            // Buscar coincidencias exactas primero
+                            let results = ph_idx.search(query);
+                            if !results.is_empty() {
+                                return results.into_iter().filter_map(|idx| {
+                                    self.catalogo.get(idx).map(|r| ffi::SearchResult {
+                                        id: r.id_codigo.clone(),
+                                        nombre: r.descripcion_articulo.clone(),
+                                        score: 1.0,
+                                    })
+                                }).collect();
+                            }
+                            // Si no hay exactas, usar fuzzy_search con max_distance=2
+                            let fuzzy_results = ph_idx.fuzzy_search(query, 2);
+                            return fuzzy_results.into_iter().filter_map(|(idx, dist)| {
+                                self.catalogo.get(idx).map(|r| ffi::SearchResult {
+                                    id: r.id_codigo.clone(),
+                                    nombre: r.descripcion_articulo.clone(),
+                                    score: 1.0 - (dist as f64 * 0.3), // Penalizar por distancia
+                                })
+                            }).collect();
                         } else {
-                            0.0
+                            // Fallback sin índice
+                            let encoder = phonetic_index::phonetic_core::DoubleMetaphone::default();
+                            use phonetic_index::phonetic_core::PhoneticEncoder;
+                            let item_phonetic = encoder.encode_primary(&item.descripcion_articulo);
+                            if let Some(ref q_phonetic) = query_phonetic {
+                                if q_phonetic == &item_phonetic { 1.0 } else { 0.0 }
+                            } else {
+                                0.0
+                            }
                         }
                     },
                     ffi::AlgoritmoType::JaroWinkler => {
@@ -211,5 +268,7 @@ pub fn new_search_master() -> Box<SearchMaster> {
         catalogo: Vec::new(),
         semantic_catalog: None,
         hnsw: None,
+        phonetic_index: None,
+        bktree_damerau: None,
     })
 }
