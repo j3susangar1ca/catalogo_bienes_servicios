@@ -4,8 +4,8 @@
 //! La selección del ancho de vector (LANES) se realiza en tiempo de compilación
 //! mediante `cfg` flags, aprovechando AVX-512 (8×u64), AVX2 (4×u64) o NEON (2×u64).
 
-// use core::simd::Simd;
-// use core::simd::num::SimdUint;
+use core::simd::{Simd, LaneCount, SupportedLaneCount};
+use core::simd::num::SimdUint;
 use crate::error::{Result, HammingError};
 
 // =============================================================================
@@ -13,13 +13,10 @@ use crate::error::{Result, HammingError};
 // =============================================================================
 
 /// Kernel SIMD genérico para `popcount(xor)` sobre slices de `u64`.
-/// 
-/// # SAFETY
-/// - `LANES` debe ser una potencia de 2 soportada por `SupportedLaneCount` (1, 2, 4, 8...).
-/// - Los slices deben ser válidos y vivir al menos durante la llamada.
-/// - `from_slice` lee exactamente `LANES` elementos; el loop nunca excede `simd_end`.
 #[inline(always)]
 pub fn popcount_xor_simd<const LANES: usize>(a: &[u64], b: &[u64]) -> Result<u64>
+where
+    LaneCount<LANES>: SupportedLaneCount,
 {
     if a.len() != b.len() {
         return Err(HammingError::IncompatibleLength {
@@ -29,15 +26,25 @@ pub fn popcount_xor_simd<const LANES: usize>(a: &[u64], b: &[u64]) -> Result<u64
     }
 
     let mut total: u64 = 0;
-    for i in 0..a.len() {
-        total += (a[i] ^ b[i]).count_ones() as u64;
+    let mut i = 0;
+    let len = a.len();
+
+    while i + LANES <= len {
+        let va = Simd::<u64, LANES>::from_slice(&a[i..i + LANES]);
+        let vb = Simd::<u64, LANES>::from_slice(&b[i..i + LANES]);
+        total += (va ^ vb).count_ones().reduce_sum() as u64;
+        i += LANES;
     }
+
+    // Remanente escalar
+    for k in i..len {
+        total += (a[k] ^ b[k]).count_ones() as u64;
+    }
+
     Ok(total)
 }
 
 // Selección de ancho vectorial en tiempo de compilación basada en target features.
-// Esto garantiza zero-cost abstraction: no hay dispatch dinámico en runtime.
-
 /// AVX-512F: 512 bits = 8 × u64.
 #[cfg(all(target_arch = "x86_64", target_feature = "avx512f"))]
 #[inline(always)]
@@ -63,7 +70,7 @@ pub fn popcount_xor(a: &[u64], b: &[u64]) -> Result<u64> {
     popcount_xor_simd::<2>(a, b)
 }
 
-/// Fallback genérico para arquitecturas sin SIMD vectorial conocido.
+/// Fallback genérico.
 #[cfg(not(any(
     all(target_arch = "x86_64", target_feature = "avx2"),
     all(target_arch = "x86_64", target_feature = "avx512f"),
@@ -81,6 +88,8 @@ pub fn popcount_xor(a: &[u64], b: &[u64]) -> Result<u64> {
 /// Kernel SIMD genérico para distancia de Hamming sobre bytes (`u8`).
 #[inline(always)]
 pub fn hamming_distance_u8_simd<const LANES: usize>(a: &[u8], b: &[u8]) -> Result<u64>
+where
+    LaneCount<LANES>: SupportedLaneCount,
 {
     if a.len() != b.len() {
         return Err(HammingError::IncompatibleLength {
@@ -90,8 +99,18 @@ pub fn hamming_distance_u8_simd<const LANES: usize>(a: &[u8], b: &[u8]) -> Resul
     }
 
     let mut total: u64 = 0;
-    for i in 0..a.len() {
-        total += (a[i] ^ b[i]).count_ones() as u64;
+    let mut i = 0;
+    let len = a.len();
+
+    while i + LANES <= len {
+        let va = Simd::<u8, LANES>::from_slice(&a[i..i + LANES]);
+        let vb = Simd::<u8, LANES>::from_slice(&b[i..i + LANES]);
+        total += (va ^ vb).count_ones().reduce_sum() as u64;
+        i += LANES;
+    }
+
+    for k in i..len {
+        total += (a[k] ^ b[k]).count_ones() as u64;
     }
 
     Ok(total)
