@@ -44,7 +44,7 @@ pub struct BitMap {
 impl BitMap {
     /// Crea un `BitMap` inicializado a cero con `u64_count` palabras de 64 bits.
     pub fn zeros(u64_count: usize) -> Self {
-        let blocks_needed = (u64_count + 3) / 4;
+        let blocks_needed = u64_count.div_ceil(4);
         Self {
             blocks: vec![AlignedU64x4([0; 4]); blocks_needed],
             len: u64_count,
@@ -53,7 +53,7 @@ impl BitMap {
 
     /// Construye un `BitMap` a partir de un slice de `u64`.
     pub fn from_u64_slice(data: &[u64]) -> Self {
-        let mut blocks = Vec::with_capacity((data.len() + 3) / 4);
+        let mut blocks = Vec::with_capacity(data.len().div_ceil(4));
         for chunk in data.chunks(4) {
             let mut arr = [0u64; 4];
             arr[..chunk.len()].copy_from_slice(chunk);

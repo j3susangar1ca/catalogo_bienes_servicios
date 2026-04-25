@@ -48,9 +48,8 @@ impl CatalogIndex {
         target: &BitMap,
         max_distance: u64,
     ) -> Vec<&CatalogRecord> {
-        let mut matches = Vec::new();
         // Pre-reserva para evitar reallocations durante la búsqueda.
-        matches.reserve(256);
+        let mut matches = Vec::with_capacity(256);
 
         for record in &self.records {
             // Cálculo obligatorio: mantiene el tiempo de ejecución independiente
