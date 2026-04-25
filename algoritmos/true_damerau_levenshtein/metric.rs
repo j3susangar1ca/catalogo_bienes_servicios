@@ -48,7 +48,7 @@ pub trait DistanceMetric: Clone + Send + Sync {
         b: &[String],
         max_distance: u32,
     ) -> Option<Distance>;
-}use crate::metric::DistanceMetric;
+}
 use crate::types::Distance;
 use crate::prelude::{is_numeric_ascii, is_alphabetic_ascii};
 
