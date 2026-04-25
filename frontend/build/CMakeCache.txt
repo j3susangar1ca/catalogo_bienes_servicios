@@ -252,6 +252,9 @@ CMAKE_TAPI:FILEPATH=CMAKE_TAPI-NOTFOUND
 // Studio IDE projects all commands are done without /nologo.
 CMAKE_VERBOSE_MAKEFILE:BOOL=FALSE
 
+//The directory containing a CMake configuration file for KF6.
+KF6_DIR:PATH=KF6_DIR-NOTFOUND
+
 //Path to a file.
 OPENGL_EGL_INCLUDE_DIR:PATH=/usr/include
 
@@ -354,6 +357,18 @@ Qt6QmlWorkerScript_DIR:PATH=/usr/lib64/cmake/Qt6QmlWorkerScript
 
 //The directory containing a CMake configuration file for Qt6Qml.
 Qt6Qml_DIR:PATH=/usr/lib64/cmake/Qt6Qml
+
+//The directory containing a CMake configuration file for Qt6QuickControls2.
+Qt6QuickControls2_DIR:PATH=/usr/lib64/cmake/Qt6QuickControls2
+
+//The directory containing a CMake configuration file for Qt6QuickEffects.
+Qt6QuickEffects_DIR:PATH=/usr/lib64/cmake/Qt6QuickEffects
+
+//The directory containing a CMake configuration file for Qt6QuickLayouts.
+Qt6QuickLayouts_DIR:PATH=/usr/lib64/cmake/Qt6QuickLayouts
+
+//The directory containing a CMake configuration file for Qt6QuickTemplates2.
+Qt6QuickTemplates2_DIR:PATH=/usr/lib64/cmake/Qt6QuickTemplates2
 
 //The directory containing a CMake configuration file for Qt6QuickTools.
 Qt6QuickTools_DIR:PATH=/usr/lib64/cmake/Qt6QuickTools
@@ -1115,6 +1130,32 @@ QT_FEATURE_quick_treeview:INTERNAL=ON
 QT_FEATURE_quick_vectorimage:INTERNAL=ON
 //Qt feature: quick_viewtransitions (from target Qt6::Quick)
 QT_FEATURE_quick_viewtransitions:INTERNAL=ON
+//Qt feature: quickcontrols2_basic (from target Qt6::QuickControls2)
+QT_FEATURE_quickcontrols2_basic:INTERNAL=ON
+//Qt feature: quickcontrols2_fluentwinui3 (from target Qt6::QuickControls2)
+QT_FEATURE_quickcontrols2_fluentwinui3:INTERNAL=ON
+//Qt feature: quickcontrols2_fusion (from target Qt6::QuickControls2)
+QT_FEATURE_quickcontrols2_fusion:INTERNAL=ON
+//Qt feature: quickcontrols2_imagine (from target Qt6::QuickControls2)
+QT_FEATURE_quickcontrols2_imagine:INTERNAL=ON
+//Qt feature: quickcontrols2_ios (from target Qt6::QuickControls2)
+QT_FEATURE_quickcontrols2_ios:INTERNAL=OFF
+//Qt feature: quickcontrols2_macos (from target Qt6::QuickControls2)
+QT_FEATURE_quickcontrols2_macos:INTERNAL=OFF
+//Qt feature: quickcontrols2_material (from target Qt6::QuickControls2)
+QT_FEATURE_quickcontrols2_material:INTERNAL=ON
+//Qt feature: quickcontrols2_universal (from target Qt6::QuickControls2)
+QT_FEATURE_quickcontrols2_universal:INTERNAL=ON
+//Qt feature: quickcontrols2_windows (from target Qt6::QuickControls2)
+QT_FEATURE_quickcontrols2_windows:INTERNAL=OFF
+//Qt feature: quicktemplates2_calendar (from target Qt6::QuickTemplates2)
+QT_FEATURE_quicktemplates2_calendar:INTERNAL=ON
+//Qt feature: quicktemplates2_container (from target Qt6::QuickTemplates2)
+QT_FEATURE_quicktemplates2_container:INTERNAL=ON
+//Qt feature: quicktemplates2_hover (from target Qt6::QuickTemplates2)
+QT_FEATURE_quicktemplates2_hover:INTERNAL=ON
+//Qt feature: quicktemplates2_multitouch (from target Qt6::QuickTemplates2)
+QT_FEATURE_quicktemplates2_multitouch:INTERNAL=ON
 //Qt feature: raster_64bit (from target Qt6::Gui)
 QT_FEATURE_raster_64bit:INTERNAL=ON
 //Qt feature: raster_fp (from target Qt6::Gui)

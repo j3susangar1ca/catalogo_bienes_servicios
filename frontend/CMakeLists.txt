@@ -39,9 +39,9 @@ qt_add_qml_module(Omnibox
 # Enlace de librerías
 target_link_libraries(Omnibox PRIVATE
     Qt6::Quick
-    Qt6::Controls2
-    Qt6::Layouts
-    Qt6::Effects
+    Qt6::QuickControls2
+    Qt6::QuickLayouts
+    Qt6::QuickEffects
     KF6::Kirigami
     rust_engine-staticlib
 )
