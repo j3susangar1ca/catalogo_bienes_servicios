@@ -1,3 +1,4 @@
+use std::collections::HashMap;
 use crate::types::Distance;
 
 /// Trait para métricas de distancia editables con zero-cost abstractions.
@@ -132,6 +133,43 @@ impl DamerauLevenshtein {
     }
 }
 
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::prelude::to_grapheme_clusters;
+
+    #[test]
+    fn test_true_damerau_levenshtein_vs_osa() {
+        let metric = DamerauLevenshtein::default();
+        // "ca" to "abc":
+        // OSA: "ca" -> "ac" (1) -> "abc" (3) because 'b' is inserted between transposed 'a' and 'c'
+        // True DL: "ca" -> "abc" (2)
+        let a = to_grapheme_clusters("ca");
+        let b = to_grapheme_clusters("abc");
+        
+        let dist = metric.distance(&a, &b);
+        assert_eq!(dist.raw(), 2, "Should be 2 in True DL (transposition + insertion)");
+    }
+
+    #[test]
+    fn test_triangle_inequality() {
+        let metric = DamerauLevenshtein::default();
+        let s1 = to_grapheme_clusters("ca");
+        let s2 = to_grapheme_clusters("abc");
+        let s3 = to_grapheme_clusters("ac");
+
+        let d12 = metric.distance(&s1, &s2).raw();
+        let d23 = metric.distance(&s2, &s3).raw();
+        let d13 = metric.distance(&s1, &s3).raw();
+
+        // d(s1, s2) = 2
+        // d(s1, s3) = 1 (transposition)
+        // d(s3, s2) = 1 (insertion)
+        // 2 <= 1 + 1 (Satisfecho)
+        assert!(d12 <= d13 + d23, "Triangle inequality failed: d(s1,s2)={} d(s1,s3)={} d(s3,s2)={}", d12, d13, d23);
+    }
+}
+
 impl DistanceMetric for DamerauLevenshtein {
     fn distance(&self, a: &[String], b: &[String]) -> Distance {
         self.distance_bounded(a, b, u32::MAX).unwrap_or_else(|| {
@@ -149,86 +187,50 @@ impl DistanceMetric for DamerauLevenshtein {
         let (n, m) = (a.len(), b.len());
         
         // Casos base optimizados
-        if n == 0 { return Some(Distance::new(m as u32)); }
-        if m == 0 { return Some(Distance::new(n as u32)); }
-        
-        // Optimización: asegurar que m <= n para minimizar espacio O(min(n,m))
-        let (rows, cols, swapped) = if m <= n {
-            (m + 1, n + 1, false)
-        } else {
-            (n + 1, m + 1, true)
-        };
-        
-        // Buffer reutilizable para técnica Row-Reuse (optimización de caché CPU)
-        let mut prev_row = vec![0u32; cols];
-        let mut curr_row = vec![0u32; cols];
-        let mut prev2_row = vec![0u32; cols]; // Para transposiciones (True DL requiere 3 filas)
-        
-        // Inicialización primera fila
-        for j in 0..cols {
-            prev_row[j] = j as u32;
+        if n == 0 { return if m as u32 <= max_distance { Some(Distance::new(m as u32)) } else { None }; }
+        if m == 0 { return if n as u32 <= max_distance { Some(Distance::new(n as u32)) } else { None }; }
+
+        // Algoritmo de Lowrance y Wagner (True Damerau-Levenshtein).
+        // Requiere una matriz completa (n+2)x(m+2) para rastrear transposiciones no adyacentes.
+        let inf = (n + m) as u32;
+        let mut d = vec![vec![0u32; m + 2]; n + 2];
+
+        // Inicialización con valores de borde e infinitos para facilitar el cálculo de transposiciones
+        d[0][0] = inf;
+        for i in 0..=n {
+            d[i + 1][1] = i as u32;
+            d[i + 1][0] = inf;
         }
-        
-        // Mapa para última posición de cada carácter (optimización True DL)
-        use std::collections::HashMap;
-        let mut char_last_pos: HashMap<&str, usize> = HashMap::new();
-        
-        for i in 1..rows {
-            let (src, tgt) = if swapped { (b, a) } else { (a, b) };
-            let i_idx = if swapped { i - 1 } else { i - 1 };
-            
-            curr_row[0] = i as u32;
-            let mut last_match_col = 0;
-            
-            for j in 1..cols {
-                let j_idx = if swapped { j - 1 } else { j - 1 };
-                
-                // Costos base
-                let del_cost = prev_row[j].saturating_add(1);
-                let ins_cost = curr_row[j-1].saturating_add(1);
-                
-                let sub_cost = if src[i_idx] == tgt[j_idx] {
+        for j in 0..=m {
+            d[1][j + 1] = j as u32;
+            d[0][j + 1] = inf;
+        }
+
+        let mut da = HashMap::new();
+
+        for i in 1..=n {
+            let mut db = 0;
+            for j in 1..=m {
+                let i1 = *da.get(&b[j-1].as_str()).unwrap_or(&0);
+                let j1 = db;
+
+                let cost = if a[i-1] == b[j-1] {
+                    db = j;
                     0
                 } else {
-                    Self::substitution_cost(&src[i_idx], &tgt[j_idx]) as u32
+                    Self::substitution_cost(&a[i-1], &b[j-1]) as u32
                 };
-                let sub_total = prev_row[j-1].saturating_add(sub_cost);
-                
-                let mut min_cost = del_cost.min(ins_cost).min(sub_total);
-                
-                // Transposición (True Damerau-Levenshtein)
-                if i > 1 && j > 1 {
-                    if let Some(trans_cost) = Self::transposition_cost(
-                        &src[i_idx-1], &src[i_idx],
-                        &tgt[j_idx-1], &tgt[j_idx]
-                    ) {
-                        let trans_total = prev2_row[j-2].saturating_add(trans_cost as u32);
-                        min_cost = min_cost.min(trans_total);
-                    }
-                }
-                
-                // Optimización: early-exit si excede max_distance
-                if min_cost > max_distance {
-                    // Actualizar estado para próxima iteración
-                    std::mem::swap(&mut prev2_row, &mut prev_row);
-                    std::mem::swap(&mut prev_row, &mut curr_row);
-                    continue;
-                }
-                
-                curr_row[j] = min_cost;
-                
-                // Actualizar última posición para optimización de transposiciones
-                if src[i_idx] == tgt[j_idx] {
-                    last_match_col = j;
-                }
+
+                // Cálculo de los 4 posibles estados (Sustitución, Inserción, Eliminación, Transposición)
+                d[i + 1][j + 1] = (d[i][j] + cost) // sustitución / match
+                    .min(d[i + 1][j] + 1) // inserción
+                    .min(d[i][j + 1] + 1) // eliminación
+                    .min(d[i1][j1] + (i - i1 - 1) as u32 + 1 + (j - j1 - 1) as u32); // transposición (True DL)
             }
-            
-            // Rotación de filas para Row-Reuse (evita reallocaciones)
-            std::mem::swap(&mut prev2_row, &mut prev_row);
-            std::mem::swap(&mut prev_row, &mut curr_row);
+            da.insert(a[i-1].as_str(), i);
         }
-        
-        let result = prev_row[if swapped { n } else { m }];
+
+        let result = d[n + 1][m + 1];
         if result <= max_distance {
             Some(Distance::new(result))
         } else {
