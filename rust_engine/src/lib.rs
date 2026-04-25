@@ -44,7 +44,7 @@ pub struct SearchMaster {
     semantic_catalog: Option<semantic_engine::index::VectorCatalog>,
     hnsw: Option<semantic_engine::index::HnswIndex>,
     // Índices adicionales para acelerar búsquedas
-    phonetic_index: Option<phonetic_index::PhoneticIndex>,
+    phonetic_index: Option<phonetic_index::index::PhoneticIndex>,
     bktree_damerau: Option<fuzzy_search_engine::index::BKTree<fuzzy_search_engine::metric::DamerauLevenshtein, String>>,
 }
 
@@ -79,12 +79,12 @@ impl SearchMaster {
                 self.hnsw = Some(hnsw);
                 
                 // Construcción de índice fonético para búsquedas O(1)
-                let phonetic_catalog: Vec<(phonetic_index::RecordId, String)> = self.catalogo
+                let phonetic_catalog: Vec<(phonetic_index::index::RecordId, String)> = self.catalogo
                     .iter()
                     .enumerate()
-                    .map(|(i, r)| (i as phonetic_index::RecordId, r.descripcion_articulo.clone()))
+                    .map(|(i, r)| (i as phonetic_index::index::RecordId, r.descripcion_articulo.clone()))
                     .collect();
-                self.phonetic_index = Some(phonetic_index::PhoneticIndex::build(&phonetic_catalog));
+                self.phonetic_index = Some(phonetic_index::index::PhoneticIndex::build(&phonetic_catalog));
                 
                 // Construcción de BK-Tree para Damerau-Levenshtein
                 let mut bktree: fuzzy_search_engine::index::BKTree<fuzzy_search_engine::metric::DamerauLevenshtein, String> = 
@@ -105,7 +105,72 @@ impl SearchMaster {
 
     pub fn buscar(&self, query: &str, algoritmo: ffi::AlgoritmoType) -> Vec<ffi::SearchResult> {
         let _query_str = query.to_lowercase();
-        
+
+        // --- 1. BÚSQUEDAS INDEXADAS (O(log N) o O(1)) ---
+
+        // Caso: Damerau-Levenshtein via BK-Tree
+        if let ffi::AlgoritmoType::DamerauLevenshtein = algoritmo {
+            if let Some(ref bktree) = self.bktree_damerau {
+                use fuzzy_search_engine::types::Similarity;
+                let results = bktree.search(query, Similarity::from_threshold(0.85));
+                return results.into_iter().map(|id| {
+                    let nombre = self.catalogo.iter()
+                        .find(|r| r.id_codigo == id)
+                        .map(|r| r.descripcion_articulo.clone())
+                        .unwrap_or_default();
+                    ffi::SearchResult { id, nombre, score: 1.0 }
+                }).take(50).collect();
+            }
+        }
+
+        // Caso: Fonético via PhoneticIndex
+        if let ffi::AlgoritmoType::Phonetic = algoritmo {
+            if let Some(ref ph_idx) = self.phonetic_index {
+                let results = ph_idx.search(query);
+                if !results.is_empty() {
+                    return results.into_iter().filter_map(|idx| {
+                        self.catalogo.get(idx).map(|r| ffi::SearchResult {
+                            id: r.id_codigo.clone(),
+                            nombre: r.descripcion_articulo.clone(),
+                            score: 1.0,
+                        })
+                    }).take(50).collect();
+                }
+                let fuzzy_results = ph_idx.fuzzy_search(query, 2);
+                return fuzzy_results.into_iter().filter_map(|(idx, dist)| {
+                    self.catalogo.get(idx).map(|r| ffi::SearchResult {
+                        id: r.id_codigo.clone(),
+                        nombre: r.descripcion_articulo.clone(),
+                        score: 1.0 - (dist as f64 * 0.3),
+                    })
+                }).take(50).collect();
+            }
+        }
+
+        // Caso especial: Búsqueda Semántica (Cosine) via HNSW
+        if let ffi::AlgoritmoType::Cosine = algoritmo {
+            if let (Some(ref cat), Some(ref hnsw)) = (&self.semantic_catalog, &self.hnsw) {
+                let backend = semantic_engine::embedding_bridge::MockEmbeddingBackend;
+                use semantic_engine::embedding_bridge::EmbeddingBackend;
+                let q_emb = backend.encode(query);
+                
+                let hnsw_results = hnsw.search(cat, q_emb.as_slice(), 50, 200);
+                return hnsw_results.into_iter().map(|res| {
+                    let nombre = self.catalogo.iter()
+                        .find(|r| r.id_codigo == res.label)
+                        .map(|r| r.descripcion_articulo.clone())
+                        .unwrap_or_default();
+                    ffi::SearchResult {
+                        id: res.label,
+                        nombre,
+                        score: res.score as f64,
+                    }
+                }).collect();
+            }
+        }
+
+        // --- 2. BÚSQUEDAS LINEALES (PARALELIZADAS CON RAYON) ---
+
         // Pre-procesamiento de query según el algoritmo para evitar trabajo redundante en el loop
         let query_shingles = if let ffi::AlgoritmoType::SorensenDice = algoritmo {
             Some(sorensen_dice_engine::shingler::generate_shingles(query))
@@ -119,14 +184,6 @@ impl SearchMaster {
             None
         };
 
-        let query_phonetic = if let ffi::AlgoritmoType::Phonetic = algoritmo {
-            let encoder = phonetic_index::phonetic_core::DoubleMetaphone::default();
-            use phonetic_index::phonetic_core::PhoneticEncoder;
-            Some(encoder.encode_primary(query))
-        } else {
-            None
-        };
-
         // Uso de RAYON para paralelismo en tus 8 núcleos
         let mut resultados: Vec<ffi::SearchResult> = self.catalogo.par_iter()
             .filter(|r| r.activo == 1) // Solo productos activos
@@ -135,37 +192,12 @@ impl SearchMaster {
                     ffi::AlgoritmoType::Hamming => {
                         let q_bytes = query.as_bytes();
                         let id_bytes = item.id_codigo.as_bytes();
-                        // Comparamos contra id_codigo si tienen la misma longitud
                         if q_bytes.len() == id_bytes.len() && !q_bytes.is_empty() {
                             hamming_hpc_engine::simd::hamming_distance_u8(q_bytes, id_bytes)
                                 .map(|d| 1.0 - (d as f64 / q_bytes.len() as f64))
                                 .unwrap_or(0.0)
                         } else {
-                            // Fallback: si el usuario busca algo que no coincide en longitud, 
-                            // podríamos probar contra una parte o retornar 0.
                             0.0
-                        }
-                    },
-                    ffi::AlgoritmoType::DamerauLevenshtein => {
-                        // Usar BK-Tree indexado para búsqueda O(log n) en lugar de O(n)
-                        if let Some(ref bktree) = self.bktree_damerau {
-                            use fuzzy_search_engine::types::Similarity;
-                            let results = bktree.search(query, Similarity::from_threshold(0.85));
-                            // Retornar el score máximo (1.0) ya que BK-Tree filtra por umbral
-                            return results.into_iter().map(|id| ffi::SearchResult {
-                                id,
-                                nombre: String::new(), // El payload es el ID, no el nombre
-                                score: 1.0,
-                            }).collect();
-                        } else {
-                            // Fallback sin índice
-                            use fuzzy_search_engine::metric::{DistanceMetric, DamerauLevenshtein};
-                            use fuzzy_search_engine::prelude::to_grapheme_clusters;
-                            let metric = DamerauLevenshtein::default();
-                            let a = to_grapheme_clusters(query);
-                            let b = to_grapheme_clusters(&item.descripcion_articulo);
-                            let dist = metric.distance(&a, &b);
-                            fuzzy_search_engine::Similarity::from_distance(dist, a.len().max(b.len())).raw()
                         }
                     },
                     ffi::AlgoritmoType::SorensenDice => {
@@ -184,50 +216,10 @@ impl SearchMaster {
                             0.0
                         }
                     },
-                    ffi::AlgoritmoType::Phonetic => {
-                        // Usar índice fonético para búsqueda O(1) en lugar de O(n)
-                        if let Some(ref ph_idx) = self.phonetic_index {
-                            // Buscar coincidencias exactas primero
-                            let results = ph_idx.search(query);
-                            if !results.is_empty() {
-                                return results.into_iter().filter_map(|idx| {
-                                    self.catalogo.get(idx).map(|r| ffi::SearchResult {
-                                        id: r.id_codigo.clone(),
-                                        nombre: r.descripcion_articulo.clone(),
-                                        score: 1.0,
-                                    })
-                                }).collect();
-                            }
-                            // Si no hay exactas, usar fuzzy_search con max_distance=2
-                            let fuzzy_results = ph_idx.fuzzy_search(query, 2);
-                            return fuzzy_results.into_iter().filter_map(|(idx, dist)| {
-                                self.catalogo.get(idx).map(|r| ffi::SearchResult {
-                                    id: r.id_codigo.clone(),
-                                    nombre: r.descripcion_articulo.clone(),
-                                    score: 1.0 - (dist as f64 * 0.3), // Penalizar por distancia
-                                })
-                            }).collect();
-                        } else {
-                            // Fallback sin índice
-                            let encoder = phonetic_index::phonetic_core::DoubleMetaphone::default();
-                            use phonetic_index::phonetic_core::PhoneticEncoder;
-                            let item_phonetic = encoder.encode_primary(&item.descripcion_articulo);
-                            if let Some(ref q_phonetic) = query_phonetic {
-                                if q_phonetic == &item_phonetic { 1.0 } else { 0.0 }
-                            } else {
-                                0.0
-                            }
-                        }
-                    },
                     ffi::AlgoritmoType::JaroWinkler => {
                         use jaro_winkler_engine::JaroWinklerMatcher;
                         let matcher = JaroWinklerMatcher::new(0.1, 4).unwrap_or(JaroWinklerMatcher { p: 0.1, l: 4 });
                         matcher.similarity(query, &item.descripcion_articulo).unwrap_or(0.0)
-                    },
-                    ffi::AlgoritmoType::Cosine => {
-                        // El score de Coseno se maneja de forma especial mediante HNSW
-                        // En este loop lineal, podríamos implementarlo, pero usaremos el HNSW si está disponible.
-                        0.0
                     },
                     _ => 0.0,
                 };
@@ -240,29 +232,6 @@ impl SearchMaster {
             })
             .filter(|res| res.score > 0.1) // Umbral mínimo de relevancia
             .collect();
-
-        // Caso especial: Búsqueda Semántica (Cosine) via HNSW
-        if let ffi::AlgoritmoType::Cosine = algoritmo {
-            if let (Some(ref cat), Some(ref hnsw)) = (&self.semantic_catalog, &self.hnsw) {
-                let backend = semantic_engine::embedding_bridge::MockEmbeddingBackend;
-                use semantic_engine::embedding_bridge::EmbeddingBackend;
-                let q_emb = backend.encode(query);
-                
-                let hnsw_results = hnsw.search(cat, q_emb.as_slice(), 50, 200);
-                return hnsw_results.into_iter().map(|res| {
-                    // Buscar el nombre original del catálogo usando el ID
-                    let nombre = self.catalogo.iter()
-                        .find(|r| r.id_codigo == res.label)
-                        .map(|r| r.descripcion_articulo.clone())
-                        .unwrap_or_default();
-                    ffi::SearchResult {
-                        id: res.label,
-                        nombre,
-                        score: res.score as f64,
-                    }
-                }).collect();
-            }
-        }
 
         // Ordenar por score de mayor a menor (Elite Ranking)
         resultados.sort_by(|a, b| b.score.partial_cmp(&a.score).unwrap_or(std::cmp::Ordering::Equal));
