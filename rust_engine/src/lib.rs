@@ -21,6 +21,7 @@ mod ffi {
         Phonetic,
         DamerauLevenshtein,
         Jaccard,
+        JaroWinkler,
     }
 
     struct SearchResult {
@@ -132,6 +133,9 @@ impl SearchMaster {
                         } else {
                             0.0
                         }
+                    },
+                    ffi::AlgoritmoType::JaroWinkler => {
+                        jaro_winkler_engine::jaro_winkler(query, &item.descripcion_articulo)
                     },
                     _ => 0.0,
                 };

@@ -17,6 +17,7 @@ fuzzy_search_engine = { path = "../algoritmos/true_damerau_levenshtein" }
 phonetic_index = { path = "../algoritmos/phonetic_index" }
 sorensen_dice_engine = { package = "sorensen-dice-engine", path = "../algoritmos/sørensen_dice" }
 jaccard_engine = { package = "jaccard-engine", path = "../algoritmos/jaccard" }
+jaro_winkler_engine = { package = "jaro-winkler-engine", path = "../algoritmos/jaro-winkler" }
 
 [build-dependencies]
 cxx-build = "1.0"
