@@ -12,18 +12,6 @@ set(CMAKE_AUTOUIC ON)
 # Buscar Qt 6
 find_package(Qt6 REQUIRED COMPONENTS Quick QuickControls2 QuickLayouts QuickEffects)
 
-# Integración con Rust vía Corrosion
-include(FetchContent)
-FetchContent_Declare(
-    Corrosion
-    GIT_REPOSITORY https://github.com/corrosion-rs/corrosion.git
-    GIT_TAG v0.5.0
-)
-FetchContent_MakeAvailable(Corrosion)
-
-# Importar el crate de Rust
-corrosion_import_crate(MANIFEST_PATH ../rust_engine/Cargo.toml)
-
 # El ejecutable
 qt_add_executable(Omnibox
     main.cpp
@@ -44,16 +32,14 @@ target_link_libraries(Omnibox PRIVATE
     Qt6::QuickControls2
     Qt6::QuickLayouts
     Qt6::QuickEffects
-    rust_engine-staticlib
+    ${CMAKE_CURRENT_SOURCE_DIR}/../target/debug/librust_engine.a
+    dl rt m pthread
 )
 
-# Ruta para encontrar lib.rs.h (generada por cxx en el build dir de Rust)
-# Corrosion pone los artefactos de build en directorios específicos.
-# Por simplicidad, añadimos la ruta donde cxx_build suele generar las cabeceras.
+# Ruta para encontrar lib.rs.h (generada por cxx en el target dir de Rust)
 target_include_directories(Omnibox PRIVATE 
     ${CMAKE_CURRENT_BINARY_DIR}
-    # La ruta exacta puede variar, pero cxx_build genera cabeceras en OUT_DIR.
-    # Con Corrosion, podemos obtener la ruta de los artefactos.
+    ${CMAKE_CURRENT_SOURCE_DIR}/../target/debug/build/rust_engine-32e7661fdbf06cf0/out/cxxbridge/include
 )
 
 # Nota: SearchModel.h incluye "lib.rs.h". 

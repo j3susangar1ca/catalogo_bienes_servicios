@@ -641,14 +641,7 @@ version = "0.1.0"
 dependencies = [
  "cxx",
  "cxx-build",
- "fuzzy_search_engine",
- "hamming-hpc-engine",
- "jaccard-engine",
- "jaro-winkler-engine",
- "phonetic_index",
  "rayon",
- "semantic_engine",
- "sorensen-dice-engine",
 ]
 
 [[package]]

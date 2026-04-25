@@ -12,14 +12,6 @@
 # =============================================================================
 
 #############################################
-# Rule for running custom commands.
-
-rule CUSTOM_COMMAND
-  command = $COMMAND
-  description = $DESC
-
-
-#############################################
 # Rule for compiling CXX files.
 
 rule CXX_COMPILER__Omnibox_unscanned_
@@ -38,6 +30,14 @@ rule CXX_EXECUTABLE_LINKER__Omnibox_
   command = $PRE_LINK && /usr/lib64/ccache/c++ $FLAGS $LINK_FLAGS $in -o $TARGET_FILE $LINK_PATH $LINK_LIBRARIES && $POST_BUILD
   description = Linking CXX executable $TARGET_FILE
   restat = $RESTAT
+
+
+#############################################
+# Rule for running custom commands.
+
+rule CUSTOM_COMMAND
+  command = $COMMAND
+  description = $DESC
 
 
 #############################################

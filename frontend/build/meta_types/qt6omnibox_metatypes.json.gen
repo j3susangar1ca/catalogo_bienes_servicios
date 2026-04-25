@@ -3,7 +3,7 @@
         "classes": [
             {
                 "className": "SearchModel",
-                "lineNumber": 12,
+                "lineNumber": 11,
                 "methods": [
                     {
                         "access": "public",
@@ -14,7 +14,7 @@
                             }
                         ],
                         "index": 1,
-                        "lineNumber": 33,
+                        "lineNumber": 32,
                         "name": "search",
                         "returnType": "void"
                     }
@@ -26,7 +26,7 @@
                         "designable": true,
                         "final": false,
                         "index": 0,
-                        "lineNumber": 15,
+                        "lineNumber": 14,
                         "name": "activeAlgorithm",
                         "notify": "activeAlgorithmChanged",
                         "read": "activeAlgorithm",
@@ -43,7 +43,7 @@
                     {
                         "access": "public",
                         "index": 0,
-                        "lineNumber": 36,
+                        "lineNumber": 35,
                         "name": "activeAlgorithmChanged",
                         "returnType": "void"
                     }

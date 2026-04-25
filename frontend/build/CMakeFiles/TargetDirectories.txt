@@ -1,13 +1,3 @@
-/home/jesuslangarica/catalogo_bienes_servicios/frontend/build/CMakeFiles/_cargo-build_semantic_engine.dir
-/home/jesuslangarica/catalogo_bienes_servicios/frontend/build/CMakeFiles/cargo-build_semantic_engine.dir
-/home/jesuslangarica/catalogo_bienes_servicios/frontend/build/CMakeFiles/cargo-prebuild_semantic_engine.dir
-/home/jesuslangarica/catalogo_bienes_servicios/frontend/build/CMakeFiles/cargo-prebuild.dir
-/home/jesuslangarica/catalogo_bienes_servicios/frontend/build/CMakeFiles/cargo-clean_semantic_engine.dir
-/home/jesuslangarica/catalogo_bienes_servicios/frontend/build/CMakeFiles/cargo-clean.dir
-/home/jesuslangarica/catalogo_bienes_servicios/frontend/build/CMakeFiles/_cargo-build_rust_engine.dir
-/home/jesuslangarica/catalogo_bienes_servicios/frontend/build/CMakeFiles/cargo-build_rust_engine.dir
-/home/jesuslangarica/catalogo_bienes_servicios/frontend/build/CMakeFiles/cargo-prebuild_rust_engine.dir
-/home/jesuslangarica/catalogo_bienes_servicios/frontend/build/CMakeFiles/cargo-clean_rust_engine.dir
 /home/jesuslangarica/catalogo_bienes_servicios/frontend/build/CMakeFiles/Omnibox.dir
 /home/jesuslangarica/catalogo_bienes_servicios/frontend/build/CMakeFiles/Omnibox_qmltyperegistration.dir
 /home/jesuslangarica/catalogo_bienes_servicios/frontend/build/CMakeFiles/all_qmltyperegistrations.dir
@@ -27,5 +17,3 @@
 /home/jesuslangarica/catalogo_bienes_servicios/frontend/build/CMakeFiles/rebuild_cache.dir
 /home/jesuslangarica/catalogo_bienes_servicios/frontend/build/CMakeFiles/Omnibox_autogen_timestamp_deps.dir
 /home/jesuslangarica/catalogo_bienes_servicios/frontend/build/CMakeFiles/Omnibox_autogen.dir
-/home/jesuslangarica/catalogo_bienes_servicios/frontend/build/_deps/corrosion-build/CMakeFiles/edit_cache.dir
-/home/jesuslangarica/catalogo_bienes_servicios/frontend/build/_deps/corrosion-build/CMakeFiles/rebuild_cache.dir

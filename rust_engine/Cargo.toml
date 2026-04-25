@@ -11,13 +11,13 @@ cxx = "1.0" # Puente para C++
 rayon = "1.10" # Para procesamiento paralelo en tus 8 núcleos
 
 # Enlaces a tus algoritmos optimizados
-hamming-hpc-engine = { path = "../algoritmos/hamming" }
-jaccard-engine = { path = "../algoritmos/jaccard" }
-jaro-winkler-engine = { path = "../algoritmos/jaro-winkler" }
-phonetic_index = { path = "../algoritmos/phonetic_index" }
-sorensen-dice-engine = { path = "../algoritmos/sørensen_dice" }
-fuzzy_search_engine = { path = "../algoritmos/true_damerau_levenshtein" }
-semantic_engine = { path = "../algoritmos/similitud_coseno/semantic_engine" }
+# hamming-hpc-engine = { path = "../algoritmos/hamming" }
+# jaccard-engine = { path = "../algoritmos/jaccard" }
+# jaro-winkler-engine = { path = "../algoritmos/jaro-winkler" }
+# phonetic_index = { path = "../algoritmos/phonetic_index" }
+# sorensen-dice-engine = { path = "../algoritmos/sørensen_dice" }
+# fuzzy_search_engine = { path = "../algoritmos/true_damerau_levenshtein" }
+# semantic_engine = { path = "../algoritmos/similitud_coseno/semantic_engine" }
 
 [build-dependencies]
 cxx-build = "1.0"

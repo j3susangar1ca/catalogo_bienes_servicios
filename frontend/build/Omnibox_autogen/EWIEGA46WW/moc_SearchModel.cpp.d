@@ -1,5 +1,6 @@
 /home/jesuslangarica/catalogo_bienes_servicios/frontend/build/Omnibox_autogen/EWIEGA46WW/moc_SearchModel.cpp: /home/jesuslangarica/catalogo_bienes_servicios/frontend/SearchModel.h \
   /home/jesuslangarica/catalogo_bienes_servicios/frontend/build/Omnibox_autogen/moc_predefs.h \
+  /home/jesuslangarica/catalogo_bienes_servicios/target/debug/build/rust_engine-32e7661fdbf06cf0/out/cxxbridge/include/rust_engine/src/lib.rs.h \
   /usr/include/alloca.h \
   /usr/include/asm-generic/bitsperlong.h \
   /usr/include/asm-generic/errno-base.h \
@@ -172,6 +173,7 @@
   /usr/include/c++/15/bits/utility.h \
   /usr/include/c++/15/bits/vector.tcc \
   /usr/include/c++/15/bits/version.h \
+  /usr/include/c++/15/cassert \
   /usr/include/c++/15/cctype \
   /usr/include/c++/15/cerrno \
   /usr/include/c++/15/chrono \

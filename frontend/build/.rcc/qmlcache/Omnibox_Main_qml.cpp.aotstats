@@ -16,7 +16,7 @@
                         {
                             "codegenResult": 2,
                             "column": 30,
-                            "durationMicroseconds": 3000,
+                            "durationMicroseconds": 0,
                             "functionName": "algoColors",
                             "line": 19,
                             "message": "Cannot generate efficient code for storing an array in a non-sequence type"

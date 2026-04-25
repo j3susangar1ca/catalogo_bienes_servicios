@@ -5,9 +5,8 @@
 #include <QString>
 #include <QVector>
 
-// Definición manual de la estructura para que C++ la conozca antes de que cxx genere la cabecera
-// O mejor, incluimos la cabecera que generará cxx.
-#include "lib.rs.h"
+// Cabecera generada por cxx
+#include "rust_engine/src/lib.rs.h"
 
 class SearchModel : public QAbstractListModel
 {
@@ -37,7 +36,7 @@ signals:
 
 private:
     int m_activeAlgorithm = 0;
-    rust::Vec<ffi::SearchResult> m_results;
+    rust::Vec<SearchResult> m_results;
     QString m_lastQuery;
 };
 
