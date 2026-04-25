@@ -3,11 +3,12 @@ resolver = "2"
 members = [
     "algoritmos/hamming",
     "algoritmos/jaccard",
+    "algoritmos/jaro-winkler",
     "algoritmos/phonetic_index",
+    "algoritmos/similitud_coseno/semantic_engine",
     "algoritmos/sørensen_dice",
     "algoritmos/true_damerau_levenshtein",
-    # Aquí irá nuestro orquestador principal:
-    "rust_engine" 
+    "rust_engine",
 ]
 
 [profile.release]
