@@ -2,30 +2,47 @@
 #include <QStandardPaths>
 #include <QDir>
 #include <QDebug>
+#include <QCoreApplication>
+#include <QFile>
 
 SearchModel::SearchModel(QObject *parent) 
     : QAbstractListModel(parent), 
       m_searchMaster(ffi::new_search_master()) 
 {
-    // 2. CARGA EN RAM (WARM-UP)
-    // Ruta configurable: primero variable de entorno, luego ubicación estándar de Qt
-    QString csvPath = qEnvironmentVariable("CATALOGO_CSV_PATH", "");
+    // Búsqueda del CSV en múltiples ubicaciones razonables
+    QString csvPath = qEnvironmentVariable("CATALOGO_CSV_PATH");
+    
     if (csvPath.isEmpty()) {
-        // Buscar en directorio de datos de la aplicación
-        QString appDataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
-        QDir().mkpath(appDataPath);
-        csvPath = appDataPath + "/catalogo.csv";
+        QStringList searchPaths = {
+            QCoreApplication::applicationDirPath() + "/catalogo.csv",
+            QCoreApplication::applicationDirPath() + "/../catalogo.csv",
+            QCoreApplication::applicationDirPath() + "/data/catalogo.csv",
+            QStandardPaths::locate(QStandardPaths::AppDataLocation, "catalogo.csv"),
+        };
+        
+        for (const auto& path : searchPaths) {
+            if (QFile::exists(path)) {
+                csvPath = path;
+                break;
+            }
+        }
+    }
+    
+    if (csvPath.isEmpty()) {
+        qCritical() << "[ERROR] catalogo.csv no encontrado. "
+                    << "Defina la variable de entorno CATALOGO_CSV_PATH "
+                    << "o coloque catalogo.csv junto al ejecutable.";
+        return;  // La UI se muestra pero las búsquedas retornan vacío
     }
     
     qDebug() << "[HPC ENGINE] Cargando catálogo desde:" << csvPath;
-    
     qDebug() << "[HPC ENGINE] Iniciando carga de catálogo en 64GB RAM...";
     bool success = m_searchMaster->cargar_catalogo(csvPath.toStdString());
     
     if(success) {
         qDebug() << "[HPC ENGINE] Catálogo vectorizado y listo para The Omnibox.";
     } else {
-        qWarning() << "[ERROR] No se pudo leer catalogo.csv. Verifica la ruta.";
+        qWarning() << "[ERROR] Falló la carga de" << csvPath;
     }
 }
 
