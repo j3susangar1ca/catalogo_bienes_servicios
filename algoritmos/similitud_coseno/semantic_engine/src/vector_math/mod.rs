@@ -17,29 +17,39 @@ pub const DIM: usize = 768;
 // ------------------------------------------------------------
 //  ALIGNED VECTOR BUFFER
 // ------------------------------------------------------------
-/// Buffer de floats alineado a 32 bytes, listo para SIMD.
-/// Garantiza que la primera dimensión caiga en un boundary AVX2.
-#[repr(C, align(32))]
+/// Buffer de floats alineado a 32 bytes en HEAP, listo para SIMD.
+/// Garantiza que el puntero a los datos caiga en un boundary de 32 bytes.
 pub struct AlignedVec {
-    pub data: Vec<f32>,
+    // Usamos f32x8 para garantizar que el allocator use alineación de 32 bytes.
+    data: Vec<f32x8>,
 }
 
 impl AlignedVec {
     /// Crea un nuevo buffer de `dim` elementos, inicializado a cero.
     pub fn zeros(dim: usize) -> Self {
-        // vec! ya aloca en heap; la alineación del struct garantiza
-        // que los primeros bytes del Vec<f32> estén alineados.
-        Self { data: vec![0.0_f32; dim] }
+        assert_eq!(dim % 8, 0, "dim debe ser múltiplo de 8 para alineación f32x8");
+        Self { data: vec![f32x8::ZERO; dim / 8] }
     }
 
     /// Crea desde un slice copiando los valores.
     pub fn from_slice(src: &[f32]) -> Self {
-        Self { data: src.to_vec() }
+        let mut v = Self::zeros(src.len());
+        v.as_slice_mut().copy_from_slice(src);
+        v
     }
 
     #[inline(always)]
     pub fn as_slice(&self) -> &[f32] {
-        &self.data
+        let ptr = self.data.as_ptr() as *const f32;
+        let len = self.data.len() * 8;
+        unsafe { std::slice::from_raw_parts(ptr, len) }
+    }
+
+    #[inline(always)]
+    pub fn as_slice_mut(&mut self) -> &mut [f32] {
+        let ptr = self.data.as_mut_ptr() as *mut f32;
+        let len = self.data.len() * 8;
+        unsafe { std::slice::from_raw_parts_mut(ptr, len) }
     }
 }
 
