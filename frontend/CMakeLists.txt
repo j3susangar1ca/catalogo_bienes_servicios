@@ -8,9 +8,9 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
-# Buscar Qt 6
+# Buscar Qt 6 y Kirigami
 find_package(Qt6 REQUIRED COMPONENTS Core Gui Quick QuickControls2 QuickLayouts QuickEffects Widgets)
-# Kirigami se carga en tiempo de ejecución en QML, no lo enlazamos aquí para evitar errores de búsqueda de config
+find_package(KF6 REQUIRED COMPONENTS Kirigami)
 
 # El ejecutable
 qt_add_executable(OmniboxLauncher
@@ -45,6 +45,7 @@ target_link_libraries(OmniboxLauncher PRIVATE
     Qt6::QuickLayouts
     Qt6::QuickEffects
     Qt6::Widgets
+    KF6::Kirigami
     ${RUST_ENGINE_LIB}
     dl rt m pthread
 )
@@ -55,7 +56,6 @@ execute_process(
     COMMAND find ${CMAKE_CURRENT_SOURCE_DIR}/../target -type d -path "*/rust_engine-*/out/cxxbridge/include"
     OUTPUT_VARIABLE CXXBRIDGE_INCLUDE_DIR
     OUTPUT_STRIP_TRAILING_WHITESPACE
-    LIMIT_COUNT 1
 )
 
 if(NOT CXXBRIDGE_INCLUDE_DIR)
