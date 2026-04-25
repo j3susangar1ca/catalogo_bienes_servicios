@@ -188,9 +188,8 @@ pub mod minhash {
     ///
     /// Internamente utiliza AHash con claves de 128 bits derivadas de la semilla.
     fn hash_with_seed(value: u64, seed: u64) -> u64 {
-        let mut hasher = AHasher::new_with_keys(seed, seed.wrapping_mul(0x9E3779B97F4A7C15));
-        hasher.write_u64(value);
-        hasher.finish()
+        let hash_builder = RandomState::with_seeds(seed, seed.wrapping_mul(0x9E3779B97F4A7C15), 0, 0);
+        hash_builder.hash_one(value)
     }
 }
 
