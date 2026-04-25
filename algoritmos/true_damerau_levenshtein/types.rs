@@ -1,3 +1,7 @@
+//! Tipos base utilizados en la evaluación de distancias y similitudes.
+//!
+//! Define los tipos fundamentales como `Distance` y `Similarity`.
+
 use std::fmt;
 use std::ops::{Add, Sub};
 

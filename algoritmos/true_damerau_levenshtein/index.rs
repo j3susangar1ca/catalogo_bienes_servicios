@@ -1,3 +1,7 @@
+//! Estructuras de indexación para espacios métricos (ej: BK-Tree).
+//!
+//! Implementa el árbol de Burkhard-Keller para búsquedas eficientes.
+
 use rayon::prelude::*;
 use crate::metric::DistanceMetric;
 use crate::types::Similarity;
