@@ -21,7 +21,9 @@ ApplicationWindow {
         "#27ae60", // Sørensen - Verde Esmeralda
         "#9b59b6", // Metaphone - Púrpura
         "#f67400", // Damerau - Naranja
-        "#da4453"  // Coseno - Rojo Carmesí
+        "#da4453", // Jaccard - Rojo
+        "#f39c12", // Jaro-Winkler - Ámbar
+        "#34495e"  // Coseno - Azul Petróleo
     ]
 
     // El modelo C++ que conecta con RUST
@@ -136,7 +138,7 @@ ApplicationWindow {
         RowLayout {
             spacing: 12
             Repeater {
-                model: ["Hamming HPC", "Sørensen-Dice", "Metaphone", "Damerau-Lev", "Coseno"]
+                model: ["Hamming HPC", "Sørensen-Dice", "Metaphone", "Damerau-Lev", "Jaccard", "Jaro-Winkler", "Semántica (Coseno)"]
                 
                 AbstractButton {
                     text: modelData
