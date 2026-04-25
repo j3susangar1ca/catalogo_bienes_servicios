@@ -14,8 +14,8 @@ fn bench_popcount_xor(c: &mut Criterion) {
         let bytes = (*size * 8) as u64;
 
         group.throughput(Throughput::Bytes(bytes));
-        group.bench_with_input(BenchmarkId::from_parameter(bytes), &bytes, |b, _| {
-            b.iter(|| simd::popcount_xor(black_box(&a), black_box(&b)).unwrap())
+        group.bench_with_input(BenchmarkId::from_parameter(bytes), &bytes, |bencher, _| {
+            bencher.iter(|| simd::popcount_xor(black_box(&a), black_box(&b)).unwrap())
         });
     }
     group.finish();
@@ -30,8 +30,8 @@ fn bench_hamming_u8(c: &mut Criterion) {
         let bytes = *size as u64;
 
         group.throughput(Throughput::Bytes(bytes));
-        group.bench_with_input(BenchmarkId::from_parameter(bytes), &bytes, |b, _| {
-            b.iter(|| simd::hamming_distance_u8(black_box(&a), black_box(&b)).unwrap())
+        group.bench_with_input(BenchmarkId::from_parameter(bytes), &bytes, |bencher, _| {
+            bencher.iter(|| simd::hamming_distance_u8(black_box(&a), black_box(&b)).unwrap())
         });
     }
     group.finish();
