@@ -49,7 +49,6 @@ pub trait DistanceMetric: Clone + Send + Sync {
         max_distance: u32,
     ) -> Option<Distance>;
 }
-use crate::types::Distance;
 use crate::prelude::{is_numeric_ascii, is_alphabetic_ascii};
 
 /// Implementación de **True Damerau-Levenshtein Distance** con ponderación dinámica.
