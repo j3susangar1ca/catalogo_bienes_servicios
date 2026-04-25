@@ -9,4 +9,7 @@ path = "jaccard.rs"
 
 [dependencies]
 unicode-segmentation = "1.10"
+unicode-normalization = "0.1"
 ahash = "0.8"
+rayon = "1.10"
+lazy_static = "1.4"
