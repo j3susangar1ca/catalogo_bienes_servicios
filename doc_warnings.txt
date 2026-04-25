@@ -1,0 +1,93 @@
+ Documenting fuzzy_search_engine v0.1.0 (/home/jesuslangarica/catalogo_bienes_servicios/algoritmos/true_damerau_levenshtein)
+warning: unresolved link to `10`
+ --> algoritmos/true_damerau_levenshtein/lib.rs:4:72
+  |
+4 | //! - **True Damerau-Levenshtein Distance** (métrica métrica válida) [[10]]
+  |                                                                        ^^ no item named `10` in scope
+  |
+  = help: to escape `[` and `]` characters, add '\' before them like `\[` or `\]`
+  = note: `#[warn(rustdoc::broken_intra_doc_links)]` on by default
+
+warning: unresolved link to `13`
+ --> algoritmos/true_damerau_levenshtein/lib.rs:5:75
+  |
+5 | //! - **BK-Tree indexing** para búsqueda eficiente en espacios métricos [[13]][[19]]
+  |                                                                           ^^ no item named `13` in scope
+  |
+  = help: to escape `[` and `]` characters, add '\' before them like `\[` or `\]`
+
+warning: unresolved link to `19`
+ --> algoritmos/true_damerau_levenshtein/lib.rs:5:81
+  |
+5 | //! - **BK-Tree indexing** para búsqueda eficiente en espacios métricos [[13]][[19]]
+  |                                                                                 ^^ no item named `19` in scope
+  |
+  = help: to escape `[` and `]` characters, add '\' before them like `\[` or `\]`
+
+warning: unresolved link to `21`
+  --> algoritmos/true_damerau_levenshtein/normalization.rs:29:76
+   |
+29 | /// Evita roturas en caracteres multiocteto (emojis, acentos combinados) [[21]][[26]].
+   |                                                                            ^^ no item named `21` in scope
+   |
+   = help: to escape `[` and `]` characters, add '\' before them like `\[` or `\]`
+
+warning: unresolved link to `26`
+  --> algoritmos/true_damerau_levenshtein/normalization.rs:29:82
+   |
+29 | /// Evita roturas en caracteres multiocteto (emojis, acentos combinados) [[21]][[26]].
+   |                                                                                  ^^ no item named `26` in scope
+   |
+   = help: to escape `[` and `]` characters, add '\' before them like `\[` or `\]`
+
+warning: unresolved link to `10`
+  --> algoritmos/true_damerau_levenshtein/metric.rs:58:89
+   |
+58 | /// satisfaciendo la desigualdad triangular para compatibilidad con espacios métricos [[10]].
+   |                                                                                         ^^ no item named `10` in scope
+   |
+   = help: to escape `[` and `]` characters, add '\' before them like `\[` or `\]`
+
+warning: unresolved link to `13`
+  --> algoritmos/true_damerau_levenshtein/index.rs:30:80
+   |
+30 | /// BK-Tree (Burkhard-Keller Tree) para búsqueda difusa en espacios métricos [[13]][[19]].
+   |                                                                                ^^ no item named `13` in scope
+   |
+   = help: to escape `[` and `]` characters, add '\' before them like `\[` or `\]`
+
+warning: unresolved link to `19`
+  --> algoritmos/true_damerau_levenshtein/index.rs:30:86
+   |
+30 | /// BK-Tree (Burkhard-Keller Tree) para búsqueda difusa en espacios métricos [[13]][[19]].
+   |                                                                                      ^^ no item named `19` in scope
+   |
+   = help: to escape `[` and `]` characters, add '\' before them like `\[` or `\]`
+
+warning: unresolved link to `13`
+   --> algoritmos/true_damerau_levenshtein/index.rs:157:69
+    |
+157 |     /// Complejidad promedio: O(n^0.5) para distribución uniforme [[13]].
+    |                                                                     ^^ no item named `13` in scope
+    |
+    = help: to escape `[` and `]` characters, add '\' before them like `\[` or `\]`
+
+warning: unresolved link to `32`
+   --> algoritmos/true_damerau_levenshtein/index.rs:214:63
+    |
+214 |     /// Búsqueda paralela de múltiples queries usando Rayon [[32]][[38]].
+    |                                                               ^^ no item named `32` in scope
+    |
+    = help: to escape `[` and `]` characters, add '\' before them like `\[` or `\]`
+
+warning: unresolved link to `38`
+   --> algoritmos/true_damerau_levenshtein/index.rs:214:69
+    |
+214 |     /// Búsqueda paralela de múltiples queries usando Rayon [[32]][[38]].
+    |                                                                     ^^ no item named `38` in scope
+    |
+    = help: to escape `[` and `]` characters, add '\' before them like `\[` or `\]`
+
+warning: `fuzzy_search_engine` (lib doc) generated 11 warnings
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.59s
+   Generated /home/jesuslangarica/catalogo_bienes_servicios/target/doc/fuzzy_search_engine/index.html
