@@ -21,15 +21,12 @@ pub fn popcount_xor_simd<const LANES: usize>(a: &[u64], b: &[u64]) -> Result<u64
 
     let mut total: u64 = 0;
     let mut i = 0;
-    let simd_end = a.len() - (a.len() % LANES);
 
-    // Procesar chunks de LANES elementos con SIMD
-    while i < simd_end {
-        let va = Simd::<u64, LANES>::from_slice(&a[i..i + LANES]);
-        let vb = Simd::<u64, LANES>::from_slice(&b[i..i + LANES]);
-        let xor = va ^ vb;
-        // Popcount por lane y reducción suma
-        total += xor.count_ones().reduce_sum() as u64;
+    // Procesar chunks de LANES elementos
+    while i + LANES <= a.len() {
+        for j in 0..LANES {
+            total += (a[i + j] ^ b[i + j]).count_ones() as u64;
+        }
         i += LANES;
     }
 
@@ -109,15 +106,12 @@ pub fn hamming_distance_u8_simd<const LANES: usize>(a: &[u8], b: &[u8]) -> Resul
 
     let mut total: u64 = 0;
     let mut i = 0;
-    let simd_end = a.len() - (a.len() % LANES);
 
-    // Procesar chunks de LANES elementos con SIMD
-    while i < simd_end {
-        let va = Simd::<u8, LANES>::from_slice(&a[i..i + LANES]);
-        let vb = Simd::<u8, LANES>::from_slice(&b[i..i + LANES]);
-        let xor = va ^ vb;
-        // Popcount por lane y reducción suma
-        total += xor.count_ones().reduce_sum() as u64;
+    // Procesar chunks de LANES elementos
+    while i + LANES <= a.len() {
+        for j in 0..LANES {
+            total += (a[i + j] ^ b[i + j]).count_ones() as u64;
+        }
         i += LANES;
     }
 
