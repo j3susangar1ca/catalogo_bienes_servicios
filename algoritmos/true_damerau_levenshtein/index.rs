@@ -265,6 +265,7 @@ where
 impl<M, T> Default for BKTree<M, T>
 where
     M: DistanceMetric + Default,
+    T: Clone + Send + Sync,
 {
     fn default() -> Self {
         Self::new()

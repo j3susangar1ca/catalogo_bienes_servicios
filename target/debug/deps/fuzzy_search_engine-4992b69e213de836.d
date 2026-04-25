@@ -1,8 +1,9 @@
-/home/jesuslangarica/catalogo_bienes_servicios/target/debug/deps/fuzzy_search_engine-4992b69e213de836.d: algoritmos/true_damerau_levenshtein/lib.rs algoritmos/true_damerau_levenshtein/prelude.rs algoritmos/true_damerau_levenshtein/metric.rs algoritmos/true_damerau_levenshtein/index.rs algoritmos/true_damerau_levenshtein/types.rs algoritmos/true_damerau_levenshtein/error.rs
+/home/jesuslangarica/catalogo_bienes_servicios/target/debug/deps/fuzzy_search_engine-4992b69e213de836.d: algoritmos/true_damerau_levenshtein/lib.rs algoritmos/true_damerau_levenshtein/normalization.rs algoritmos/true_damerau_levenshtein/prelude.rs algoritmos/true_damerau_levenshtein/metric.rs algoritmos/true_damerau_levenshtein/index.rs algoritmos/true_damerau_levenshtein/types.rs algoritmos/true_damerau_levenshtein/error.rs
 
-/home/jesuslangarica/catalogo_bienes_servicios/target/debug/deps/libfuzzy_search_engine-4992b69e213de836.rmeta: algoritmos/true_damerau_levenshtein/lib.rs algoritmos/true_damerau_levenshtein/prelude.rs algoritmos/true_damerau_levenshtein/metric.rs algoritmos/true_damerau_levenshtein/index.rs algoritmos/true_damerau_levenshtein/types.rs algoritmos/true_damerau_levenshtein/error.rs
+/home/jesuslangarica/catalogo_bienes_servicios/target/debug/deps/libfuzzy_search_engine-4992b69e213de836.rmeta: algoritmos/true_damerau_levenshtein/lib.rs algoritmos/true_damerau_levenshtein/normalization.rs algoritmos/true_damerau_levenshtein/prelude.rs algoritmos/true_damerau_levenshtein/metric.rs algoritmos/true_damerau_levenshtein/index.rs algoritmos/true_damerau_levenshtein/types.rs algoritmos/true_damerau_levenshtein/error.rs
 
 algoritmos/true_damerau_levenshtein/lib.rs:
+algoritmos/true_damerau_levenshtein/normalization.rs:
 algoritmos/true_damerau_levenshtein/prelude.rs:
 algoritmos/true_damerau_levenshtein/metric.rs:
 algoritmos/true_damerau_levenshtein/index.rs:
