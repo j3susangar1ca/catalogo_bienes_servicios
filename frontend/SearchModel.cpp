@@ -3,10 +3,10 @@
 #include <QDir>
 #include <QDebug>
 
-SearchModel::SearchModel(QObject *parent) : QAbstractListModel(parent) {
-    // 1. Instanciamos el motor de Rust (asignación de memoria HPC)
-    m_searchMaster = ffi::new_search_master();
-    
+SearchModel::SearchModel(QObject *parent) 
+    : QAbstractListModel(parent), 
+      m_searchMaster(ffi::new_search_master()) 
+{
     // 2. CARGA EN RAM (WARM-UP)
     // Ruta configurable: primero variable de entorno, luego ubicación estándar de Qt
     QString csvPath = qEnvironmentVariable("CATALOGO_CSV_PATH", "");

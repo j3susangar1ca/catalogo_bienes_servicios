@@ -51,13 +51,7 @@ target_link_libraries(OmniboxLauncher PRIVATE
 )
 
 # Ruta para encontrar lib.rs.h y cxxbridge headers
-# Buscar dinámicamente el directorio de cxxbridge include
-execute_process(
-    COMMAND find ${CMAKE_CURRENT_SOURCE_DIR}/../target -type d -path "*/rust_engine-*/out/cxxbridge/include"
-    OUTPUT_VARIABLE CXXBRIDGE_INCLUDE_DIR
-    OUTPUT_STRIP_TRAILING_WHITESPACE
-)
-string(REPLACE "\n" ";" CXXBRIDGE_INCLUDE_DIR "${CXXBRIDGE_INCLUDE_DIR}")
+set(CXXBRIDGE_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../target/cxxbridge)
 
 if(NOT CXXBRIDGE_INCLUDE_DIR)
     # Fallback: usar el directorio include estándar de rust_engine
