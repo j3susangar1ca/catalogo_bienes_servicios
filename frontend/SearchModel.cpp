@@ -50,6 +50,7 @@ void SearchModel::search(const QString &query) {
         case 3: rustAlgo = ffi::AlgoritmoType::DamerauLevenshtein; break;
         case 4: rustAlgo = ffi::AlgoritmoType::Jaccard; break;
         case 5: rustAlgo = ffi::AlgoritmoType::JaroWinkler; break;
+        case 6: rustAlgo = ffi::AlgoritmoType::Cosine; break;
         default: rustAlgo = ffi::AlgoritmoType::Hamming;
     }
 
