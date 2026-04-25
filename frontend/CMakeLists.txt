@@ -6,7 +6,7 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Buscar Qt 6
-find_package(Qt6 REQUIRED COMPONENTS Quick Controls2 Layouts Effects)
+find_package(Qt6 REQUIRED COMPONENTS Quick QuickControls2 QuickLayouts QuickEffects)
 # Buscar Kirigami (KDE)
 find_package(KF6 REQUIRED COMPONENTS Kirigami)
 
