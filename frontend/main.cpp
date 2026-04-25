@@ -19,7 +19,8 @@ int main(int argc, char *argv[]) {
 
     // 2. Cargamos la interfaz QML
     // Cargamos desde el sistema de recursos de Qt (compilado vía qt_add_qml_module)
-    const QUrl url(u"qrc:/qt/qml/TheOmnibox/Main.qml"_qs);
+    // Cuando QTP0001 no está establecido, el prefijo por defecto es qrc:/URI/
+    const QUrl url(u"qrc:/TheOmnibox/Main.qml"_qs);
     
     QObject::connect(&engine, &QQmlApplicationEngine::objectCreated,
                      &app, [url](QObject *obj, const QUrl &objUrl) {
